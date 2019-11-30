@@ -1,5 +1,8 @@
+from aocd.models import Puzzle
+
 import aoc
 
-inp = aoc.get_input(1)
-print(inp)
+
+puzzle = Puzzle(year=2018, day=1)
+print(puzzle.input_data)
 
