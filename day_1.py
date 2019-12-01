@@ -10,7 +10,7 @@ inputs = puzzle.input_data.splitlines()
 # PART 1
 
 def find_fuel(weight: int):
-    return (weight // 3) - 2
+    return max((weight // 3) - 2, 0)
 
 
 puzzle.answer_a = sum([find_fuel(int(x)) for x in inputs])
