@@ -4,7 +4,7 @@ import aoc
 
 
 puzzle = Puzzle(year=2019, day=1)
-inputs = puzzle.input_data.splitlines()
+inputs = aoc.ints(puzzle.input_data)
 
 
 # PART 1
@@ -13,7 +13,7 @@ def find_fuel(weight: int):
     return max((weight // 3) - 2, 0)
 
 
-puzzle.answer_a = sum([find_fuel(int(x)) for x in inputs])
+puzzle.answer_a = sum([find_fuel(x) for x in inputs])
 
 
 # PART 2
@@ -27,4 +27,4 @@ def find_recursive_fuel(weight: int):
         return fuel + find_recursive_fuel(fuel)
 
 
-puzzle.answer_b = sum([find_recursive_fuel(int(x)) for x in inputs])
+puzzle.answer_b = sum([find_recursive_fuel(x) for x in inputs])

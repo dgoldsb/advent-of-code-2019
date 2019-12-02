@@ -6,6 +6,7 @@ import os
 import re
 import sys
 import typing
+from copy import copy
 
 
 with open("session_cookie") as f:
@@ -76,3 +77,33 @@ def positive_floats(s: str) -> typing.List[float]:
 def words(s: str) -> typing.List[str]:
     """Thanks mcpower!"""
     return re.findall(r"[a-zA-Z]+", s)
+
+
+#############################
+# Intcode related functions #
+#############################
+
+
+def run_intcode(x: typing.List[int], p: int):
+    if x[p] == 1:
+        x[x[p + 3]] = x[x[p + 1]] + x[x[p + 2]]
+        return True, x
+    elif x[p] == 2:
+        x[x[p + 3]] = x[x[p + 1]] * x[x[p + 2]]
+        return True, x
+    elif x[p] == 99:
+        return False, x
+    else:
+        raise ValueError(f"{x[p]} is not an intcode operator (pointer={p})")
+
+
+def run_intcode_program(s: typing.List[int]):
+    sequence = copy(s)
+    cont = True
+    pointer = 0
+
+    while cont:
+        cont, sequence = run_intcode(sequence, pointer)
+        pointer += 4
+
+    return sequence
