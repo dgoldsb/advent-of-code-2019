@@ -2,6 +2,7 @@
 AOC-helpers, inspired by GitHub user mcpowers (https://gist.github.com/mcpower/87427528b9ba5cac6f0c679370789661).
 """
 
+import math
 import os
 import re
 import sys
@@ -107,3 +108,17 @@ def run_intcode_program(s: typing.List[int]):
         pointer += 4
 
     return sequence
+
+
+####################
+# Common functions #
+####################
+
+
+def manhattan(x, y):
+    dist = 0
+
+    for dim in range(len(x)):
+        dist += math.fabs(x[dim] - y[dim])
+
+    return int(dist)
