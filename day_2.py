@@ -8,12 +8,14 @@ import aoc
 puzzle = Puzzle(year=2019, day=2)
 inputs = aoc.ints(puzzle.input_data)
 
+
 # PART 1
 
 program = copy(inputs)
 program[1] = 12
 program[2] = 2
 puzzle.answer_a = aoc.run_intcode_program(program)[0]
+
 
 # PART 2
 
