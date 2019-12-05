@@ -84,81 +84,123 @@ def words(s: str) -> typing.List[str]:
 # Intcode related functions #
 #############################
 
-def parse_instruction(instr: int):
-    instr = str(instr)
 
-    if len(instr) < 3:
-        return int(instr), (0, 0, 0)
+class IntcodeEmulator:
+    __input: int
+    __pointer: int
+    __program: typing.List[int]
+    __state: typing.List[int]
+    __terminated: bool
 
-    instr = "0" * (5 - len(instr)) + instr
+    @property
+    def state(self):
+        return self.__state
 
-    return int(instr[-2:]), (int(instr[2]), int(instr[1]), int(instr[0]))
+    def reset(self):
+        self.__pointer = 0
 
+    def run(self, program: typing.List[int], input_value: int = None):
+        self.__input = input_value
+        self.__pointer = 0
+        self.__program = copy(program)
+        self.__state = copy(program)
+        self.__terminated = False
 
-def get_parameter(x: typing.List[int], p: int, m: int):
-    v = x[p]
-    if m == 0:
-        return x[v]
-    elif m == 1:
-        return v
-    else:
-        raise ValueError
+        outputs = []
 
+        while not self.__terminated:
+            output = self._run_next_opcode()
+            outputs.append(output)
 
-def run_intcode(x: typing.List[int], p: int, input: int):
-    opcode, modes = parse_instruction(x[p])
+        return outputs
 
-    if opcode == 1:
-        v = get_parameter(x, p + 1, modes[0]) + get_parameter(x, p + 2, modes[1])
-        x[x[p + 3]] = v
-        return True, x, p+4, None
-    elif opcode == 2:
-        v = get_parameter(x, p + 1, modes[0]) * get_parameter(x, p + 2, modes[1])
-        x[x[p + 3]] = v
-        return True, x, p+4, None
-    elif opcode == 3:
-        x[x[p + 1]] = input
-        return True, x, p+2, None
-    elif opcode == 4:
-        v = get_parameter(x, p + 1, modes[0])
-        return True, x, p+2, v
-    elif opcode == 5:
-        if get_parameter(x, p + 1, modes[0]) > 0:
-            p = get_parameter(x, p + 2, modes[1])
+    def _get_command_string(self) -> str:
+        command = str(self.__state[self.__pointer])
+
+        while len(command) < 5:
+            command = "0" + command
+
+        return command
+
+    def _get_mode(self, index: int) -> int:
+        """
+        Get the mode for the parameter that is that is <index> away from the pointer.
+        """
+        return int(self._get_command_string()[3 - index])
+
+    def _get_opcode(self):
+        return int(self._get_command_string()[-2:])
+
+    def _get_parameter(self, index: int) -> int:
+        """Get the parameter that is <index> away from the pointer."""
+        p = self.__state[self.__pointer + index]
+
+        if self._get_mode(index) == 0:
+            return self.__state[p]
+        elif self._get_mode(index) == 1:
+            return p
         else:
-            p += 3
-        return True, x, p, None
-    elif opcode == 6:
-        if get_parameter(x, p + 1, modes[0]) == 0:
-            p = get_parameter(x, p + 2, modes[1])
+            raise ValueError(f"Invalid get mode: {self._get_mode(index)}")
+
+    def _store_parameter(self, index: int, value):
+        p = self.__state[self.__pointer + index]
+
+        if self._get_mode(index) == 0:
+            self.__state[p] = value
         else:
-            p += 3
-        return True, x, p, None
-    elif opcode == 7:
-        v = get_parameter(x, p + 1, modes[0]) < get_parameter(x, p + 2, modes[1])
-        x[x[p + 3]] = int(v)
-        return True, x, p+4, None
-    elif opcode == 8:
-        v = get_parameter(x, p + 1, modes[0]) == get_parameter(x, p + 2, modes[1])
-        x[x[p + 3]] = int(v)
-        return True, x, p+4, None
-    elif opcode == 99:
-        return False, x, p+1, None
-    else:
-        raise ValueError(f"{x[p]} is not an intcode operator (pointer={p})")
+            raise ValueError(f"Invalid store mode: {self._get_mode(index)}")
 
+    def _run_next_opcode(self):
+        opcode = self._get_opcode()
 
-def run_intcode_program(s: typing.List[int], input: int = None):
-    sequence = copy(s)
-    cont = True
-    pointer = 0
-    outputs = []
-
-    while cont:
-        cont, sequence, pointer, output = run_intcode(sequence, pointer, input)
-        outputs.append(output)
-
-    return sequence, outputs
+        if opcode == 1:
+            # addition
+            result = self._get_parameter(1) + self._get_parameter(2)
+            self._store_parameter(3, result)
+            self.__pointer += 4
+        elif opcode == 2:
+            # multiplication
+            result = self._get_parameter(1) * self._get_parameter(2)
+            self._store_parameter(3, result)
+            self.__pointer += 4
+        elif opcode == 3:
+            # input
+            self._store_parameter(1, self.__input)
+            self.__pointer += 2
+        elif opcode == 4:
+            # output
+            result = self._get_parameter(1)
+            self.__pointer += 2
+            return result
+        elif opcode == 5:
+            # jump-if-true
+            if bool(self._get_parameter(1)):
+                self.__pointer = self._get_parameter(2)
+            else:
+                self.__pointer += 3
+        elif opcode == 6:
+            # jump-if-false
+            if not bool(self._get_parameter(1)):
+                self.__pointer = self._get_parameter(2)
+            else:
+                self.__pointer += 3
+        elif opcode == 7:
+            # less-than
+            result = self._get_parameter(1) < self._get_parameter(2)
+            self._store_parameter(3, result)
+            self.__pointer += 4
+        elif opcode == 8:
+            # equals
+            result = self._get_parameter(1) == self._get_parameter(2)
+            self._store_parameter(3, result)
+            self.__pointer += 4
+        elif opcode == 99:
+            # terminate
+            self.__terminated = True
+        else:
+            raise ValueError(
+                f"{opcode} is not an intcode operator (pointer={self.__pointer})"
+            )
 
 
 ####################

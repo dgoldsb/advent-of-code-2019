@@ -11,15 +11,15 @@ inputs = aoc.ints(puzzle.input_data)
 
 # PART 1
 
-program = copy(inputs)
-_, output = aoc.run_intcode_program(program, 1)
-failed_tests = set(output) - {0, None}
+emulator = aoc.IntcodeEmulator()
+outputs = emulator.run(inputs, input_value=1)
+failed_tests = set(outputs) - {0, None}
 puzzle.answer_a = list(failed_tests)[0]
 
 
 # PART 2
 
-program = copy(inputs)
-_, output = aoc.run_intcode_program(program, 5)
-failed_tests = set(output) - {0, None}
+emulator = aoc.IntcodeEmulator()
+outputs = emulator.run(inputs, input_value=5)
+failed_tests = set(outputs) - {0, None}
 puzzle.answer_b = list(failed_tests)[0]
