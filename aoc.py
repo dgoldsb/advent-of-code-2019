@@ -84,30 +84,81 @@ def words(s: str) -> typing.List[str]:
 # Intcode related functions #
 #############################
 
+def parse_instruction(instr: int):
+    instr = str(instr)
 
-def run_intcode(x: typing.List[int], p: int):
-    if x[p] == 1:
-        x[x[p + 3]] = x[x[p + 1]] + x[x[p + 2]]
-        return True, x
-    elif x[p] == 2:
-        x[x[p + 3]] = x[x[p + 1]] * x[x[p + 2]]
-        return True, x
-    elif x[p] == 99:
-        return False, x
+    if len(instr) < 3:
+        return int(instr), (0, 0, 0)
+
+    instr = "0" * (5 - len(instr)) + instr
+
+    return int(instr[-2:]), (int(instr[2]), int(instr[1]), int(instr[0]))
+
+
+def get_parameter(x: typing.List[int], p: int, m: int):
+    v = x[p]
+    if m == 0:
+        return x[v]
+    elif m == 1:
+        return v
+    else:
+        raise ValueError
+
+
+def run_intcode(x: typing.List[int], p: int, input: int):
+    opcode, modes = parse_instruction(x[p])
+
+    if opcode == 1:
+        v = get_parameter(x, p + 1, modes[0]) + get_parameter(x, p + 2, modes[1])
+        x[x[p + 3]] = v
+        return True, x, p+4, None
+    elif opcode == 2:
+        v = get_parameter(x, p + 1, modes[0]) * get_parameter(x, p + 2, modes[1])
+        x[x[p + 3]] = v
+        return True, x, p+4, None
+    elif opcode == 3:
+        x[x[p + 1]] = input
+        return True, x, p+2, None
+    elif opcode == 4:
+        v = get_parameter(x, p + 1, modes[0])
+        return True, x, p+2, v
+    elif opcode == 5:
+        if get_parameter(x, p + 1, modes[0]) > 0:
+            p = get_parameter(x, p + 2, modes[1])
+        else:
+            p += 3
+        return True, x, p, None
+    elif opcode == 6:
+        if get_parameter(x, p + 1, modes[0]) == 0:
+            p = get_parameter(x, p + 2, modes[1])
+        else:
+            p += 3
+        return True, x, p, None
+    elif opcode == 7:
+        v = get_parameter(x, p + 1, modes[0]) < get_parameter(x, p + 2, modes[1])
+        x[x[p + 3]] = int(v)
+        return True, x, p+4, None
+    elif opcode == 8:
+        v = get_parameter(x, p + 1, modes[0]) == get_parameter(x, p + 2, modes[1])
+        x[x[p + 3]] = int(v)
+        return True, x, p+4, None
+    elif opcode == 99:
+        return False, x, p+1, None
     else:
         raise ValueError(f"{x[p]} is not an intcode operator (pointer={p})")
 
 
-def run_intcode_program(s: typing.List[int]):
+def run_intcode_program(s: typing.List[int], input: int):
     sequence = copy(s)
     cont = True
     pointer = 0
+    outputs = []
 
     while cont:
-        cont, sequence = run_intcode(sequence, pointer)
-        pointer += 4
+        cont, sequence, pointer, output = run_intcode(sequence, pointer, input)
+        outputs.append(output)
 
-    return sequence
+    return sequence, outputs
 
 
 ####################
