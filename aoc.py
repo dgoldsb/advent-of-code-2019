@@ -148,7 +148,7 @@ def run_intcode(x: typing.List[int], p: int, input: int):
         raise ValueError(f"{x[p]} is not an intcode operator (pointer={p})")
 
 
-def run_intcode_program(s: typing.List[int], input: int):
+def run_intcode_program(s: typing.List[int], input: int = None):
     sequence = copy(s)
     cont = True
     pointer = 0
