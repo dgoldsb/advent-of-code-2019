@@ -215,3 +215,10 @@ def manhattan(x, y):
         dist += math.fabs(x[dim] - y[dim])
 
     return int(dist)
+
+
+def path_to_root(child_parent_map: typing.Dict, child: typing.Any):
+    if child in child_parent_map.keys():
+        return [child] + path_to_root(child_parent_map, child_parent_map[child])
+    else:
+        return [child]
