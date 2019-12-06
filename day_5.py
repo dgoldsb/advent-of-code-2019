@@ -1,5 +1,3 @@
-from copy import copy
-
 from aocd.models import Puzzle
 
 import aoc
