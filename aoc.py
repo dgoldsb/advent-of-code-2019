@@ -18,7 +18,7 @@ sys.setrecursionlimit(100000)
 
 
 def lmap(func, *iterables):
-    """Thanks mcpower!"""
+    """Thanks mcpowers!"""
     return list(map(func, *iterables))
 
 
@@ -26,7 +26,7 @@ def make_grid(*dimensions: typing.List[int], fill=None):
     """
     Returns a grid such that 'dimensions' is juuust out of bounds.
 
-    Thanks mcpower!
+    Thanks mcpowers!
     """
     ""
     if len(dimensions) == 1:
@@ -36,22 +36,22 @@ def make_grid(*dimensions: typing.List[int], fill=None):
 
 
 def min_max(l):
-    """Thanks mcpower!"""
+    """Thanks mcpowers!"""
     return min(l), max(l)
 
 
 def max_minus_min(l):
-    """Thanks mcpower!"""
+    """Thanks mcpowers!"""
     return max(l) - min(l)
 
 
 def list_diff(x):
-    """Thanks mcpower!"""
+    """Thanks mcpowers!"""
     return [b-a for a, b in zip(x, x[1:])]
 
 
 def flatten(l):
-    """Thanks mcpower!"""
+    """Thanks mcpowers!"""
     return [i for x in l for i in x]
 
 
@@ -66,17 +66,17 @@ def positive_ints(s: str) -> typing.List[int]:
 
 
 def floats(s: str) -> typing.List[float]:
-    """Thanks mcpower!"""
+    """Thanks mcpowers!"""
     return lmap(float, re.findall(r"-?\d+(?:\.\d+)?", s))
 
 
 def positive_floats(s: str) -> typing.List[float]:
-    """Thanks mcpower!"""
+    """Thanks mcpowers!"""
     return lmap(float, re.findall(r"\d+(?:\.\d+)?", s))
 
 
 def words(s: str) -> typing.List[str]:
-    """Thanks mcpower!"""
+    """Thanks mcpowers!"""
     return re.findall(r"[a-zA-Z]+", s)
 
 
@@ -86,7 +86,7 @@ def words(s: str) -> typing.List[str]:
 
 
 class IntcodeEmulator:
-    __input: int
+    __inputs: typing.Iterable[int]
     __pointer: int
     __program: typing.List[int]
     __state: typing.List[int]
@@ -99,8 +99,8 @@ class IntcodeEmulator:
     def reset(self):
         self.__pointer = 0
 
-    def run(self, program: typing.List[int], input_value: int = None):
-        self.__input = input_value
+    def run(self, program: typing.List[int], inputs: typing.Iterable[int] = None):
+        self.__inputs = inputs
         self.__pointer = 0
         self.__program = copy(program)
         self.__state = copy(program)
@@ -110,7 +110,8 @@ class IntcodeEmulator:
 
         while not self.__terminated:
             output = self._run_next_opcode()
-            outputs.append(output)
+            if output is not None:
+                outputs.append(output)
 
         return outputs
 
@@ -165,7 +166,7 @@ class IntcodeEmulator:
             self.__pointer += 4
         elif opcode == 3:
             # input
-            self._store_parameter(1, self.__input)
+            self._store_parameter(1, next(self.__inputs))
             self.__pointer += 2
         elif opcode == 4:
             # output
