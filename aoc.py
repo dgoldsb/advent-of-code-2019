@@ -90,6 +90,7 @@ class IntcodeEmulator:
     def __init__(self, program, inputs=None, name="default"):
         self._pointer: int = 0
         self._program: typing.List[int] = copy(program)
+        self._relative_base = 0
         self._state: typing.List[int] = copy(program)
         self._terminated = False
 
@@ -103,6 +104,9 @@ class IntcodeEmulator:
 
     def reset(self):
         self._pointer = 0
+        self._relative_base = 0
+        self._state = self._program
+        self._terminated = False
 
     async def run(self):
         while not self._terminated:
@@ -110,6 +114,11 @@ class IntcodeEmulator:
             if output is not None:
                 print(f"{self.name} PUT {output}")
                 self.outputs.put_nowait(output)
+
+    def _extend_to(self, index):
+        if index >= len(self._state):
+            extension = [0] * (index - len(self._state) + 1)
+            self._state = self._state + extension
 
     def _get_command_string(self) -> str:
         command = str(self._state[self._pointer])
@@ -130,20 +139,30 @@ class IntcodeEmulator:
 
     def _get_parameter(self, index: int) -> int:
         """Get the parameter that is <index> away from the pointer."""
+        self._extend_to(self._pointer + index)
         p = self._state[self._pointer + index]
 
         if self._get_mode(index) == 0:
+            self._extend_to(p)
             return self._state[p]
         elif self._get_mode(index) == 1:
             return p
+        elif self._get_mode(index) == 2:
+            self._extend_to(self._pointer + self._relative_base)
+            return self._state[self._relative_base + p]
         else:
             raise ValueError(f"Invalid get mode: {self._get_mode(index)}")
 
     def _store_parameter(self, index: int, value):
+        self._extend_to(self._pointer + index)
         p = self._state[self._pointer + index]
 
         if self._get_mode(index) == 0:
+            self._extend_to(p)
             self._state[p] = value
+        elif self._get_mode(index) == 2:
+            self._extend_to(self._pointer + self._relative_base)
+            self._state[self._relative_base + p] = value
         else:
             raise ValueError(f"Invalid store mode: {self._get_mode(index)}")
 
@@ -193,6 +212,10 @@ class IntcodeEmulator:
             result = self._get_parameter(1) == self._get_parameter(2)
             self._store_parameter(3, result)
             self._pointer += 4
+        elif opcode == 9:
+            # adjust-relative-base
+            self._relative_base += self._get_parameter(1)
+            self._pointer += 2
         elif opcode == 99:
             # terminate
             print(f"{self.name} TERM")
