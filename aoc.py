@@ -9,6 +9,7 @@ import re
 import sys
 import typing
 from copy import copy
+from math import atan2, pi
 
 
 with open("session_cookie") as f:
@@ -229,6 +230,12 @@ class IntcodeEmulator:
 ####################
 # Common functions #
 ####################
+
+def compute_angle(a: typing.Tuple[int, int], b: typing.Tuple[int, int]) -> float:
+    """Angle in degrees, starting from the x-axis ("3 o'clock") and moving clockwise."""
+    if a == b:
+        raise ValueError("Cannot compute angle for identical points.")
+    return (atan2((b[1] - a[1]), (b[0] - a[0])) * (180 / pi) + 90) % 360
 
 
 def manhattan(x, y):
