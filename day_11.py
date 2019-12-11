@@ -132,7 +132,6 @@ min_y = min(x[1] for x in paint_robot.white.union(paint_robot.black))
 max_x = max(x[0] for x in paint_robot.white.union(paint_robot.black))
 max_y = max(x[1] for x in paint_robot.white.union(paint_robot.black))
 
-
 grid = []
 for _ in range(max_y - min_y + 1):
     row = []
