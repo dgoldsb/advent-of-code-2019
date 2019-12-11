@@ -1,5 +1,4 @@
 import asyncio
-import itertools
 
 from aocd.models import Puzzle
 

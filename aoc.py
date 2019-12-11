@@ -3,6 +3,7 @@ AOC-helpers, inspired by GitHub user mcpowers (https://gist.github.com/mcpower/8
 """
 
 import asyncio
+import logging
 import math
 import os
 import re
@@ -93,7 +94,7 @@ class IntcodeEmulator:
         self._program: typing.List[int] = copy(program)
         self._relative_base = 0
         self._state: typing.List[int] = copy(program)
-        self._terminated = False
+        self.terminated = False
 
         self.inputs: asyncio.Queue = inputs
         self.name = name
@@ -107,13 +108,13 @@ class IntcodeEmulator:
         self._pointer = 0
         self._relative_base = 0
         self._state = self._program
-        self._terminated = False
+        self.terminated = False
 
     async def run(self):
-        while not self._terminated:
+        while not self.terminated:
             output = await self._run_next_opcode()
             if output is not None:
-                print(f"{self.name} PUT {output}")
+                logging.debug("%s: PUT %s", self.name, output)
                 self.outputs.put_nowait(output)
 
     def _extend_to(self, index):
@@ -183,7 +184,7 @@ class IntcodeEmulator:
         elif opcode == 3:
             # input
             inp = await self.inputs.get()
-            print(f"{self.name} GET {inp}")
+            logging.debug("%s: GET %s", self.name, inp)
             self._store_parameter(1, inp)
             self._pointer += 2
         elif opcode == 4:
@@ -219,8 +220,8 @@ class IntcodeEmulator:
             self._pointer += 2
         elif opcode == 99:
             # terminate
-            print(f"{self.name} TERM")
-            self._terminated = True
+            logging.debug(f"%s: TERM", self.name)
+            self.terminated = True
         else:
             raise ValueError(
                 f"{opcode} is not an intcode operator (pointer={self._pointer})"
