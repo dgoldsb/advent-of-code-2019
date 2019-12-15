@@ -159,6 +159,9 @@ class IntcodeEmulator:
         self._extend_to(self._pointer + index)
         p = self._state[self._pointer + index]
 
+        logging.debug("%s: STORE TO %s", self.name, p)
+        logging.debug("%s: STORE VALUE %s", self.name, value)
+
         if self._get_mode(index) == 0:
             self._extend_to(p)
             self._state[p] = value
@@ -206,12 +209,12 @@ class IntcodeEmulator:
                 self._pointer += 3
         elif opcode == 7:
             # less-than
-            result = self._get_parameter(1) < self._get_parameter(2)
+            result = int(self._get_parameter(1) < self._get_parameter(2))
             self._store_parameter(3, result)
             self._pointer += 4
         elif opcode == 8:
             # equals
-            result = self._get_parameter(1) == self._get_parameter(2)
+            result = int(self._get_parameter(1) == self._get_parameter(2))
             self._store_parameter(3, result)
             self._pointer += 4
         elif opcode == 9:

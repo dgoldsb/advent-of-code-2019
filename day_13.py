@@ -161,7 +161,4 @@ async def play_game():
     await asyncio.gather(*tasks)
 
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
-
 output = asyncio.run(play_game())
