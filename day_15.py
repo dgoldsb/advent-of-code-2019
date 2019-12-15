@@ -92,15 +92,12 @@ def bfs():
 
 
 bfs_result = bfs()
-# TODO: Remove next line.
-bfs_result = [2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 2, 2, 3, 3, 3, 3, 2, 2, 3, 3, 3, 3, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 3, 3, 1, 1, 4, 4, 4, 4, 2, 2, 4, 4, 1, 1, 1, 1, 3, 3, 1, 1, 3, 3, 3, 3, 2, 2, 3, 3, 3, 3, 3, 3, 2, 2, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 4, 4, 1, 1, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 2, 2, 2, 2, 2, 2, 4, 4, 1, 1, 4, 4, 4, 4, 2, 2, 4, 4, 1, 1, 1, 1, 1, 1, 4, 4, 1, 1, 4, 4, 4, 4, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2, 4, 4, 2, 2, 3, 3, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 3, 3, 3, 3, 2, 2, 4, 4, 2, 2, 3, 3, 3, 3, 1, 1, 1, 1, 3, 3, 2, 2, 2, 2, 3, 3, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 4, 4, 4, 4, 2, 2, 3, 3, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 3, 3, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 3, 3, 1, 1, 1, 1, 3, 3, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 4, 4, 1, 1, 3, 3, 1, 1, 3, 3, 3, 3, 3, 3, 2, 2, 3, 3, 1, 1, 3, 3, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 1, 1, 4, 4, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 3, 3, 2, 2, 2, 2, 3, 3, 3, 3, 1, 1, 4, 4, 1, 1, 1, 1, 1, 1, 4, 4, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2]
 puzzle.answer_a = len(bfs_result)
 
 
 # PART 2
 
 # TODO: Consolidate with previous.
-
 def modified_bfs(initialize_commands):
     roomba = RepairRoomba(inputs)
     queue = Queue()
@@ -116,6 +113,7 @@ def modified_bfs(initialize_commands):
 
         if len(path) > len(longest_path):
             longest_path = copy(path)
+            print(f"Longest path length: {len(longest_path)}")
 
         for c in (1, 2, 3, 4):
             new_path = copy(path)
@@ -130,5 +128,4 @@ def modified_bfs(initialize_commands):
 
 
 modified_bfs_result = modified_bfs(bfs_result)
-print(modified_bfs_result)
-print(len(modified_bfs_result))
+puzzle.answer_b = len(modified_bfs_result)
