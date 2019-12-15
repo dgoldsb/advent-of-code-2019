@@ -44,11 +44,16 @@ class RepairRoomba:
 
         return output
 
-    async def run(self, commands):
+    async def run(self, commands, init=None):
         self._brain = aoc.IntcodeEmulator(self.program, asyncio.Queue())
         event_loop = asyncio.create_task(self._brain.run())
         did_loop = False
         path = set()
+
+        if init is not None:
+            for command in init:
+                await self._move(command)
+
 
         for command in commands:
             path.add(self.position)
@@ -86,5 +91,44 @@ def bfs():
                 queue.put(new_path)
 
 
-result = bfs()
-print(result)
+bfs_result = bfs()
+# TODO: Remove next line.
+bfs_result = [2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 2, 2, 3, 3, 3, 3, 2, 2, 3, 3, 3, 3, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 3, 3, 1, 1, 4, 4, 4, 4, 2, 2, 4, 4, 1, 1, 1, 1, 3, 3, 1, 1, 3, 3, 3, 3, 2, 2, 3, 3, 3, 3, 3, 3, 2, 2, 3, 3, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 4, 4, 1, 1, 4, 4, 1, 1, 1, 1, 1, 1, 1, 1, 4, 4, 2, 2, 2, 2, 2, 2, 4, 4, 1, 1, 4, 4, 4, 4, 2, 2, 4, 4, 1, 1, 1, 1, 1, 1, 4, 4, 1, 1, 4, 4, 4, 4, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2, 4, 4, 2, 2, 3, 3, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 3, 3, 3, 3, 2, 2, 4, 4, 2, 2, 3, 3, 3, 3, 1, 1, 1, 1, 3, 3, 2, 2, 2, 2, 3, 3, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 4, 4, 4, 4, 2, 2, 3, 3, 2, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 3, 3, 1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 3, 3, 1, 1, 1, 1, 3, 3, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 4, 4, 1, 1, 3, 3, 1, 1, 3, 3, 3, 3, 3, 3, 2, 2, 3, 3, 1, 1, 3, 3, 2, 2, 2, 2, 4, 4, 4, 4, 4, 4, 1, 1, 4, 4, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 1, 1, 3, 3, 2, 2, 2, 2, 3, 3, 3, 3, 1, 1, 4, 4, 1, 1, 1, 1, 1, 1, 4, 4, 1, 1, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2]
+puzzle.answer_a = len(bfs_result)
+
+
+# PART 2
+
+# TODO: Consolidate with previous.
+
+def modified_bfs(initialize_commands):
+    roomba = RepairRoomba(inputs)
+    queue = Queue()
+
+    # Add the initial value.
+    queue.put([])
+
+    # Set the longest path.
+    longest_path = []
+
+    while not queue.empty():
+        path = queue.get()
+
+        if len(path) > len(longest_path):
+            longest_path = copy(path)
+
+        for c in (1, 2, 3, 4):
+            new_path = copy(path)
+            new_path.append(c)
+
+            arrived, did_loop = asyncio.run(roomba.run(new_path, initialize_commands))
+
+            if not did_loop:
+                queue.put(new_path)
+
+    return longest_path
+
+
+modified_bfs_result = modified_bfs(bfs_result)
+print(modified_bfs_result)
+print(len(modified_bfs_result))
