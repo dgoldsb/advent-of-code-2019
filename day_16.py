@@ -1,6 +1,5 @@
 import logging
 import numpy as np
-import sys
 from functools import lru_cache
 
 from aocd.models import Puzzle
@@ -11,6 +10,8 @@ import aoc
 puzzle = Puzzle(year=2019, day=16)
 inputs = puzzle.input_data
 
+
+# PART 1
 
 @lru_cache()
 def generate_matrix(length: int):
@@ -57,20 +58,27 @@ def iterate_pattern(subject: str, iterations: int):
 
 assert iterate_pattern("12345678", 4) == "01029498"
 
-
-# PART 1
-
 puzzle.answer_a = iterate_pattern(inputs, 100)[:8]
 
 
 # PART 2
 
-def calculate_part_2(subject: str):
-    output = iterate_pattern(subject * 10000, 100)
-    offset = int(output[:7])
-    return output[offset:offset + 8]
+# It finally clicked:
+# - The offset is beyond the half-way point.
+# - Everything beyond the half-way point follows the simple rule where the
+#   v[i][t+1] = v[i][t] + v[i+1][t+1].
+# - The last value always stays the same.
+# - For v[i], index before i will ever matter, no matter how many iteration.
+
+def solve(subject: str, iterations: int):
+    subject = [int(x) for x in subject]
+    for _ in range(iterations):
+        for i in range(-2, - len(subject) - 1, -1):
+            subject[i] = (subject[i] + subject[i + 1]) % 10
+
+    return "".join([str(x) for x in subject])
 
 
-logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
-print(calculate_part_2("03036732577212944063491565474664"))
-#assert calculate_part_2("03036732577212944063491565474664") == "84462026"
+offset = int(inputs[:7])
+relevant_input = (inputs * 10000)[offset:]
+puzzle.answer_b = solve(relevant_input, 100)[:8]
