@@ -9,15 +9,11 @@ import aoc
 
 puzzle = Puzzle(year=2019, day=18)
 inputs = puzzle.input_data
-inputs = """#################
-#i.G..c...e..H.p#
-########.########
-#j.A..b...f..D.o#
-########@########
-#k.E..a...g..B.n#
-########.########
-#l.F..d...h..C.m#
-#################"""
+inputs = """########################
+#...............b.C.D.f#
+#.######################
+#.....@.a.B.c.d.A.e.F.g#
+########################"""
 
 # Get the maze.
 maze = aoc.char_array(inputs)
@@ -56,7 +52,7 @@ for key in valid_keys:
 
 # Use the cached results to do part 1.
 # TODO: We are repeating generic base cases a lot, dynamic programming?
-# TODO: Some of the examples are still bugged.
+# TODO: Some of the examples are still bugged, it is not deterministic!
 def part_1(start, missing, retrieved):
     if len(missing) == 1:
         key = list(missing)[0]
@@ -91,7 +87,6 @@ def part_1(start, missing, retrieved):
             except TypeError:
                 pass
 
-        print(shortest_path)
         return shortest_path
 
 
