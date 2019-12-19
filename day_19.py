@@ -29,28 +29,7 @@ def in_tractor_beam(x, y):
 
 
 # PART 1
-#puzzle.answer_a = sum([in_tractor_beam(x, y) for x in range(50) for y in range(50)])
-
-
-# PART 2
-def valid_10_by_10(x, y):
-    return (
-        bool(in_tractor_beam(x, y)) and
-        bool(in_tractor_beam(x + 9, y)) and
-        bool(in_tractor_beam(x, y + 9)) and
-        bool(in_tractor_beam(x + 9, y + 9))
-    )
-
-
-def part_2():
-    for x in range(110):
-        for y in range(110):
-            if valid_10_by_10(x, y):
-                return x, y
-
-
-part_2 = part_2()
-puzzle.answer_b = part_2[0] * 10 ** 4 + part_2[1]
+puzzle.answer_a = sum([in_tractor_beam(x, y) for x in range(50) for y in range(50)])
 
 
 # FUN INTERMEZZO
@@ -64,11 +43,35 @@ for x_ in range(120):
             row.append(".")
     image.append(row)
 
-for x_ in range(10):
-    for y_ in range(10):
-        if image[part_2[0] + x_][part_2[1] + y_] != "#":
-            raise RuntimeError
-        image[part_2[0] + x_][part_2[1] + y_] = "0"
-
-
 print("\n".join(["".join(row) for row in image]))
+
+
+# PART 2
+def valid_10_by_10(x, y, size):
+    return (
+        bool(in_tractor_beam(x, y)) and
+        bool(in_tractor_beam(x + size - 1, y)) and
+        bool(in_tractor_beam(x, y + size - 1))
+    )
+
+
+def part_2():
+    fv = 0
+    for x in range(1000):
+        found_first = False
+        for y in range(fv, 1000):
+            if bool(in_tractor_beam(x, y)):
+                if not found_first:
+                    fv = y
+                    found_first = True
+
+                if valid_10_by_10(x, y, 100):
+                    return x, y
+            else:
+                if found_first:
+                    print(f"Width of {y - fv} at x={x}")
+                    break
+
+
+part_2 = part_2()
+puzzle.answer_b = part_2[0] * 10 ** 4 + part_2[1]
