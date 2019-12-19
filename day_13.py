@@ -1,5 +1,4 @@
 import asyncio
-import os
 from copy import copy
 
 from aocd.models import Puzzle
