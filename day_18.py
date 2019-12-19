@@ -1,5 +1,4 @@
 from collections import defaultdict
-from copy import copy
 from functools import lru_cache
 
 from aocd.models import Puzzle
@@ -9,11 +8,6 @@ import aoc
 
 puzzle = Puzzle(year=2019, day=18)
 inputs = puzzle.input_data
-inputs = """########################
-#...............b.C.D.f#
-#.######################
-#.....@.a.B.c.d.A.e.F.g#
-########################"""
 
 # Get the maze.
 maze = aoc.char_array(inputs)
@@ -52,25 +46,23 @@ for key in valid_keys:
 
 # Use the cached results to do part 1.
 # TODO: We are repeating generic base cases a lot, dynamic programming?
-# TODO: Some of the examples are still bugged, it is not deterministic!
-def part_1(start, missing, retrieved):
+@lru_cache(10 ** 6)
+def part_1(start, missing):
     if len(missing) == 1:
         key = list(missing)[0]
         return [(find_path_length(start, KEY_LOCATIONS[key]), key)]
     else:
         paths = []
         for key in missing:
-            if BLOCKERS[key] - retrieved:
+            obtained = set(valid_keys) - set(missing)
+            if BLOCKERS[key].difference(obtained):
                 continue
 
             path_part = [(find_path_length(start, KEY_LOCATIONS[key]), key)]
 
-            new_missing = copy(missing)
-            new_retrieved = copy(retrieved)
+            new_missing = list(missing)
             new_missing.remove(key)
-            new_retrieved.add(key)
-
-            path_rest = part_1(KEY_LOCATIONS[key], new_missing, new_retrieved)
+            path_rest = part_1(KEY_LOCATIONS[key], tuple(new_missing))
 
             if path_rest is None:
                 continue
@@ -91,6 +83,6 @@ def part_1(start, missing, retrieved):
 
 
 print(BLOCKERS)
-answer = part_1(start_location, set(valid_keys), set())
+answer = part_1(start_location, tuple(valid_keys))
 print(answer)
 print(sum([x[0] for x in answer]))
