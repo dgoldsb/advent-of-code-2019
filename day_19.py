@@ -47,7 +47,7 @@ print("\n".join(["".join(row) for row in image]))
 
 
 # PART 2
-def valid_10_by_10(x, y, size):
+def valid_square(x, y, size):
     return (
         bool(in_tractor_beam(x, y)) and
         bool(in_tractor_beam(x + size - 1, y)) and
@@ -65,7 +65,7 @@ def part_2():
                     fv = y
                     found_first = True
 
-                if valid_10_by_10(x, y, 100):
+                if valid_square(x, y, 100):
                     return x, y
             else:
                 if found_first:
