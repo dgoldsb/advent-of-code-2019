@@ -305,7 +305,10 @@ class Portal:
         z_delta = 1 if self.recursive else 0
 
         if a.x == self.entrance.x and a.y == self.entrance.y:
-            return Node(self.exit.x, self.exit.y, a.z + z_delta)
+            new_node = Node(self.exit.x, self.exit.y, a.z + z_delta)
+
+            if new_node.z < 45:
+                return new_node
         elif a.x == self.exit.x and a.y == self.exit.y:
             new_node = Node(self.entrance.x, self.entrance.y, a.z - z_delta)
 
@@ -427,8 +430,8 @@ def a_star_route(
 
 def a_star_distance(
         maze: typing.List[typing.List[typing.Union[int, typing.Any]]],
-        start: typing.Tuple[int, int],
-        end: typing.Tuple[int, int],
+        start: typing,
+        end: typing,
         walkable: typing.Any = 0,
         portals: typing.List[Portal] = None,
 ) -> typing.Union[int, None]:

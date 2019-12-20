@@ -42,7 +42,7 @@ RE....#.#                           #......RF
   #############.#.#.###.###################  
                A O F   N                     
                A A D   M                     
-                                             """
+                                              """
 
 UPPERS = [chr(c) for c in range(65, 91)]
 
@@ -100,8 +100,9 @@ def get_portals(m, recursive=False):
 
 # PART 1
 
-#portals = list(get_portals(maze))
-#distance = aoc.a_star_distance(maze, stage["AA"], stage["ZZ"], ".", portals)
+portals = list(get_portals(maze))
+distance = aoc.a_star_distance(maze, stage["AA"], stage["ZZ"], ".", portals)
+print(f"Answer a is {distance}")
 #puzzle.answer_a = distance
 
 # PART 2
@@ -114,9 +115,5 @@ distance = aoc.a_star_distance(
     ".",
     portals,
 )
-#puzzle.answer_a = distance
-print(distance)
-
-# TODO: This is really interesting, we need to add the notion of an inner- or outer
-#  portal, and the notion of a recursion level, where 0 does not allow you to go
-#  negative, and 0 is required.
+#puzzle.answer_b = distance
+print(f"Answer b is {distance}")
