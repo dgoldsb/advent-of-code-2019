@@ -277,11 +277,34 @@ def path_to_root(child_parent_map: typing.Dict, child: typing.Any):
 # Maze Related Algorithms #
 ###########################
 
+class Portal:
+    def __init__(self, name, a, b):
+        self.name = name
+        self.entrance = a
+        self.exit = b
+
+    def enter(self, a):
+        if a == self.entrance:
+            return self.exit
+        elif a == self.exit:
+            return self.entrance
+        else:
+            return None
+
+
 class AStarGraph:
     """https://rosettacode.org/wiki/A*_search_algorithm#Python"""
-    def __init__(self, walkables: typing.List[typing.Tuple[int, int]]):
-        # Define a class board like grid with two barriers.
+    def __init__(
+            self,
+            walkables: typing.List[typing.Tuple[int, int]],
+            portals: typing.List[Portal],
+    ):
+        self.portals = portals if portals else []
         self.walkables = walkables
+
+        for portal in self.portals:
+            assert portal.entrance in self.walkables
+            assert portal.exit in self.walkables
 
     @staticmethod
     def heuristic(start, goal):
@@ -300,6 +323,12 @@ class AStarGraph:
 
             if (x2, y2) in self.walkables:
                 yield (x2, y2)
+
+        for portal in self.portals:
+            exit = portal.enter(pos)
+            if exit:
+                print(f"Jump in {portal.name} to {exit}")
+                yield exit
 
 
 def a_star(start, end, graph):
@@ -361,6 +390,7 @@ def a_star_route(
         start: typing.Tuple[int, int],
         end: typing.Tuple[int, int],
         walkable: typing.Any = 0,
+        portals: typing.List[Portal] = None,
 ):
     walkables = []
     for row_index, row in enumerate(maze):
@@ -368,7 +398,7 @@ def a_star_route(
             if field == walkable:
                 walkables.append((row_index, col_index))
 
-    graph = AStarGraph(walkables)
+    graph = AStarGraph(walkables, portals)
     route = a_star(start, end, graph)
     if route:
         return route[0]
@@ -381,8 +411,9 @@ def a_star_distance(
         start: typing.Tuple[int, int],
         end: typing.Tuple[int, int],
         walkable: typing.Any = 0,
+        portals: typing.List[Portal] = None,
 ) -> typing.Union[int, None]:
-    route = a_star_route(maze, start, end, walkable)
+    route = a_star_route(maze, start, end, walkable, portals)
     return len(route) - 1 if route else None
 
 

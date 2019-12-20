@@ -36,6 +36,8 @@ puzzle.answer_a = sum([in_tractor_beam(x, y) for x in range(50) for y in range(5
 image = []
 for x_ in range(120):
     row = []
+
+    # TODO: Be more consistent in this _-suffixing when working in the global scope.
     for y_ in range(120):
         if in_tractor_beam(x_, y_) == 1:
             row.append("#")
