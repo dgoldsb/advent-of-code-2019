@@ -12,6 +12,15 @@ UPPERS = [chr(c) for c in range(65, 91)]
 maze = aoc.char_array(inputs)
 
 
+def is_outer(loc, m):
+    return (
+        loc[0] < 4 or
+        loc[1] < 4 or
+        loc[0] > (len(m) - 4) or
+        loc[1] > (len(m[0]) - 4)
+    )
+
+
 def parse_portal(x, y, m):
     assert m[x][y] in UPPERS
 
@@ -32,7 +41,7 @@ def parse_portal(x, y, m):
 stage = {}
 
 
-def get_portals(m):
+def get_portals(m, recursive=False):
     global stage
     for x in range(1, len(maze) - 1):
         for y in range(1, len(maze[x]) - 1):
@@ -40,7 +49,11 @@ def get_portals(m):
                 name, loc = parse_portal(x, y, m)
                 if name:
                     try:
-                        yield aoc.Portal(name, stage[name], loc)
+                        if is_outer(loc, m):
+                            yield aoc.Portal(name, stage[name], loc, recursive)
+                        else:
+                            yield aoc.Portal(name, loc, stage[name], recursive)
+
                     except KeyError:
                         stage[name] = loc
             except AssertionError:
@@ -51,8 +64,8 @@ def get_portals(m):
 
 portals = list(get_portals(maze))
 distance = aoc.a_star_distance(maze, stage["AA"], stage["ZZ"], ".", portals)
-puzzle.answer_a = distance
-
+#puzzle.answer_a = distance
+print(distance)
 
 # PART 2
 

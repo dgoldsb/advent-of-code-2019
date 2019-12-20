@@ -277,10 +277,10 @@ def path_to_root(child_parent_map: typing.Dict, child: typing.Any):
 # Maze Related Algorithms #
 ###########################
 class Node:
-    def __init__(self, x, y):
+    def __init__(self, x, y, z=1):
         self.x = x
         self.y = y
-        self.z = 1  # level
+        self.z = z  # level
 
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y and self.z == other.z
@@ -293,18 +293,27 @@ class Node:
 
 
 class Portal:
-    def __init__(self, name, a: typing.Tuple[int, int], b: typing.Tuple[int, int]):
+    def __init__(
+        self, name, a: typing.Tuple[int, int], b: typing.Tuple[int, int], recursive
+    ):
         self.name = name
         self.entrance = Node(*a)
         self.exit = Node(*b)
+        self.recursive = recursive
 
     def enter(self, a: Node):
+        z_delta = 1 if self.recursive else 0
+
         if a == self.entrance:
-            return self.exit
+            new_node = Node(self.exit.x, self.exit.y, self.exit.z - z_delta)
+
+            # Cannot go lower than the first level.
+            if new_node.z > 0:
+                return new_node
         elif a == self.exit:
-            return self.entrance
-        else:
-            return None
+            return Node(self.entrance.x, self.entrance.y, self.entrance.z - z_delta)
+
+        return None
 
 
 class AStarGraph:
