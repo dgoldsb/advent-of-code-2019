@@ -47,6 +47,15 @@ def get_portals(m):
                 pass
 
 
+# PART 1
+
 portals = list(get_portals(maze))
 distance = aoc.a_star_distance(maze, stage["AA"], stage["ZZ"], ".", portals)
 puzzle.answer_a = distance
+
+
+# PART 2
+
+# TODO: This is really interesting, we need to add the notion of an inner- or outer
+#  portal, and the notion of a recursion level, where 0 does not allow you to go
+#  negative, and 0 is required.

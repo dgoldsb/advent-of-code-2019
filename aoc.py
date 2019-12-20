@@ -276,14 +276,29 @@ def path_to_root(child_parent_map: typing.Dict, child: typing.Any):
 ###########################
 # Maze Related Algorithms #
 ###########################
+class Node:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.z = 1  # level
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y and self.z == other.z
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def __str__(self):
+        return f"({self.x},{self.y},{self.z})"
+
 
 class Portal:
-    def __init__(self, name, a, b):
+    def __init__(self, name, a: typing.Tuple[int, int], b: typing.Tuple[int, int]):
         self.name = name
-        self.entrance = a
-        self.exit = b
+        self.entrance = Node(*a)
+        self.exit = Node(*b)
 
-    def enter(self, a):
+    def enter(self, a: Node):
         if a == self.entrance:
             return self.exit
         elif a == self.exit:
@@ -296,7 +311,7 @@ class AStarGraph:
     """https://rosettacode.org/wiki/A*_search_algorithm#Python"""
     def __init__(
             self,
-            walkables: typing.List[typing.Tuple[int, int]],
+            walkables: typing.List[Node],
             portals: typing.List[Portal],
     ):
         self.portals = portals if portals else []
@@ -307,27 +322,22 @@ class AStarGraph:
             assert portal.exit in self.walkables
 
     @staticmethod
-    def heuristic(start, goal):
-        # Use Chebyshev distance heuristic if we can move one square either adjacent
-        # or diagonal.
-        D = 1
-        D2 = 1
-        dx = abs(start[0] - goal[0])
-        dy = abs(start[1] - goal[1])
-        return D * (dx + dy) + (D2 - 2 * D) * min(dx, dy)
+    def heuristic(start: Node, goal: Node):
+        return manhattan((start.x, start.y, start.z), (goal.x, goal.y, goal.z))
 
-    def get_vertex_neighbours(self, pos):
+    def get_vertex_neighbours(self, pos: Node):
         for dx, dy in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
-            x2 = pos[0] + dx
-            y2 = pos[1] + dy
+            x2 = pos.x + dx
+            y2 = pos.y + dy
 
-            if (x2, y2) in self.walkables:
-                yield (x2, y2)
+            for node in self.walkables:
+                if node.x == x2 and node.y == y2 and node.z == pos.z:
+                    yield node
 
         for portal in self.portals:
             exit = portal.enter(pos)
             if exit:
-                print(f"Jump in {portal.name} to {exit}")
+                print(f"Jump in {portal.name} to {exit})")
                 yield exit
 
 
@@ -396,10 +406,10 @@ def a_star_route(
     for row_index, row in enumerate(maze):
         for col_index, field in enumerate(row):
             if field == walkable:
-                walkables.append((row_index, col_index))
+                walkables.append(Node(row_index, col_index))
 
     graph = AStarGraph(walkables, portals)
-    route = a_star(start, end, graph)
+    route = a_star(Node(*start), Node(*end), graph)
     if route:
         return route[0]
     else:
