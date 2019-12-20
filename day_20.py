@@ -5,6 +5,44 @@ import aoc
 
 puzzle = Puzzle(year=2019, day=20)
 inputs = puzzle.input_data
+inputs = """             Z L X W       C                 
+             Z P Q B       K                 
+  ###########.#.#.#.#######.###############  
+  #...#.......#.#.......#.#.......#.#.#...#  
+  ###.#.#.#.#.#.#.#.###.#.#.#######.#.#.###  
+  #.#...#.#.#...#.#.#...#...#...#.#.......#  
+  #.###.#######.###.###.#.###.###.#.#######  
+  #...#.......#.#...#...#.............#...#  
+  #.#########.#######.#.#######.#######.###  
+  #...#.#    F       R I       Z    #.#.#.#  
+  #.###.#    D       E C       H    #.#.#.#  
+  #.#...#                           #...#.#  
+  #.###.#                           #.###.#  
+  #.#....OA                       WB..#.#..ZH
+  #.###.#                           #.#.#.#  
+CJ......#                           #.....#  
+  #######                           #######  
+  #.#....CK                         #......IC
+  #.###.#                           #.###.#  
+  #.....#                           #...#.#  
+  ###.###                           #.#.#.#  
+XF....#.#                         RF..#.#.#  
+  #####.#                           #######  
+  #......CJ                       NM..#...#  
+  ###.#.#                           #.###.#  
+RE....#.#                           #......RF
+  ###.###        X   X       L      #.#.#.#  
+  #.....#        F   Q       P      #.#.#.#  
+  ###.###########.###.#######.#########.###  
+  #.....#...#.....#.......#...#.....#.#...#  
+  #####.#.###.#######.#######.###.###.#.#.#  
+  #.......#.......#.#.#.#.#...#...#...#.#.#  
+  #####.###.#####.#.#.#.#.###.###.#.###.###  
+  #.......#.....#.#...#...............#...#  
+  #############.#.#.###.###################  
+               A O F   N                     
+               A A D   M                     
+                                             """
 
 UPPERS = [chr(c) for c in range(65, 91)]
 
@@ -62,12 +100,22 @@ def get_portals(m, recursive=False):
 
 # PART 1
 
-portals = list(get_portals(maze))
-distance = aoc.a_star_distance(maze, stage["AA"], stage["ZZ"], ".", portals)
+#portals = list(get_portals(maze))
+#distance = aoc.a_star_distance(maze, stage["AA"], stage["ZZ"], ".", portals)
 #puzzle.answer_a = distance
-print(distance)
 
 # PART 2
+
+portals = list(get_portals(maze, recursive=True))
+distance = aoc.a_star_distance(
+    maze,
+    (stage["AA"][0], stage["AA"][1], 0),
+    (stage["ZZ"][0], stage["ZZ"][1], 0),
+    ".",
+    portals,
+)
+#puzzle.answer_a = distance
+print(distance)
 
 # TODO: This is really interesting, we need to add the notion of an inner- or outer
 #  portal, and the notion of a recursion level, where 0 does not allow you to go

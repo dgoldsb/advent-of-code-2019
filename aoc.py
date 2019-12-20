@@ -277,7 +277,7 @@ def path_to_root(child_parent_map: typing.Dict, child: typing.Any):
 # Maze Related Algorithms #
 ###########################
 class Node:
-    def __init__(self, x, y, z=1):
+    def __init__(self, x, y, z=0):
         self.x = x
         self.y = y
         self.z = z  # level
@@ -304,14 +304,14 @@ class Portal:
     def enter(self, a: Node):
         z_delta = 1 if self.recursive else 0
 
-        if a == self.entrance:
-            new_node = Node(self.exit.x, self.exit.y, self.exit.z - z_delta)
+        if a.x == self.entrance.x and a.y == self.entrance.y:
+            return Node(self.exit.x, self.exit.y, a.z + z_delta)
+        elif a.x == self.exit.x and a.y == self.exit.y:
+            new_node = Node(self.entrance.x, self.entrance.y, a.z - z_delta)
 
             # Cannot go lower than the first level.
-            if new_node.z > 0:
+            if new_node.z >= 0:
                 return new_node
-        elif a == self.exit:
-            return Node(self.entrance.x, self.entrance.y, self.entrance.z - z_delta)
 
         return None
 
@@ -340,8 +340,8 @@ class AStarGraph:
             y2 = pos.y + dy
 
             for node in self.walkables:
-                if node.x == x2 and node.y == y2 and node.z == pos.z:
-                    yield node
+                if node.x == x2 and node.y == y2:
+                    yield Node(x2, y2, pos.z)
 
         for portal in self.portals:
             exit = portal.enter(pos)
@@ -406,8 +406,8 @@ def a_star(start, end, graph):
 
 def a_star_route(
         maze: typing.List[typing.List[typing.Union[int, typing.Any]]],
-        start: typing.Tuple[int, int],
-        end: typing.Tuple[int, int],
+        start: typing.Tuple,
+        end: typing.Tuple,
         walkable: typing.Any = 0,
         portals: typing.List[Portal] = None,
 ):
