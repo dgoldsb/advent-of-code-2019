@@ -276,6 +276,10 @@ def path_to_root(child_parent_map: typing.Dict, child: typing.Any):
 ###########################
 # Maze Related Algorithms #
 ###########################
+
+# TODO: Split day 20 and 18 here, see what can be shared and what cannot... Maybe it
+#  works to consider the keys portals?
+
 class Node:
     def __init__(self, x, y, z=0):
         self.x = x
