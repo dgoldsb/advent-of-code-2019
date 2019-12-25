@@ -22,6 +22,7 @@ sys.setrecursionlimit(100)
 
 # TODO: This can be applied in some old days as well.
 def char_array(string: str):
+    string = string
     array = []
     row = []
 
@@ -31,6 +32,9 @@ def char_array(string: str):
             row = []
         else:
             row.append(char)
+
+    if row:
+        array.append(row)
 
     return array
 
