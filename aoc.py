@@ -17,7 +17,7 @@ with open("session_cookie") as f:
     session = f.readline().strip()
 
 os.environ["AOC_SESSION"] = session
-sys.setrecursionlimit(100)
+sys.setrecursionlimit(1000)
 
 
 # TODO: This can be applied in some old days as well.
