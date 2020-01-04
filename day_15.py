@@ -97,7 +97,6 @@ puzzle.answer_a = len(bfs_result)
 
 # PART 2
 
-# TODO: Consolidate with previous.
 def modified_bfs(initialize_commands):
     roomba = RepairRoomba(inputs)
     queue = Queue()

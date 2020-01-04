@@ -20,7 +20,6 @@ os.environ["AOC_SESSION"] = session
 sys.setrecursionlimit(1000)
 
 
-# TODO: This can be applied in some old days as well.
 def char_array(string: str):
     string = string
     array = []
@@ -113,11 +112,12 @@ class IntcodeEmulator:
         self._program: typing.List[int] = copy(program)
         self._relative_base = 0
         self._state: typing.List[int] = copy(program)
-        self.terminated = False
 
         self.inputs: asyncio.Queue = inputs
         self.name = name
         self.outputs = asyncio.Queue()
+        self.terminated = False
+        self.waiting = False
 
     @property
     def state(self):
@@ -249,6 +249,74 @@ class IntcodeEmulator:
                 f"{opcode} is not an intcode operator (pointer={self._pointer})"
             )
 
+
+class AsciiComputerExit(Exception):
+    pass
+
+
+class AsciiComputer:
+    def __init__(self, program):
+        self._emulator = None
+        self._io_history = []
+        self._program = program
+
+    async def give_input(self, inputs: str):
+        assert isinstance(self._emulator, IntcodeEmulator)
+
+        if inputs == "exit":
+            raise AsciiComputerExit
+        else:
+            self._io_history.append(inputs)
+
+            for char in inputs:
+                self._emulator.inputs.put_nowait(ord(char))
+
+            await self._emulator.inputs.put(ord("\n"))
+
+    def render(self):
+        assert isinstance(self._emulator, IntcodeEmulator)
+
+        outputs = []
+        while not self._emulator.outputs.empty():
+            outputs.append(self._emulator.outputs.get_nowait())
+
+        image = [chr(x) for x in outputs]
+        print("".join(image))
+        return image
+
+    async def io_loop(self, instructions):
+        last_render = self.render()
+
+        while not self._emulator.terminated:
+            if last_render:
+                try:
+                    i = next(instructions)
+                except StopIteration:
+                    i = input("Give a command: ")
+
+                await self.give_input(i)
+            else:
+                await asyncio.sleep(1)
+
+            last_render = self.render()
+
+    async def run(self, instructions=None):
+        self._emulator = IntcodeEmulator(self._program, asyncio.Queue())
+
+        # TODO: make this an iterable that is iterated over...
+        # TODO: make the thing raise an error if the door test is failed.
+        # TODO: use itertools to try all drop combinations, see where no error is
+        #  raised by following with an exit.
+
+        instructions = instructions or iter([])
+        tasks = [self._emulator.run(), self.io_loop(instructions)]
+
+        try:
+            await asyncio.gather(*tasks)
+        except AsciiComputerExit:
+            pass
+
+        return self._io_history
 
 ####################
 # Common functions #

@@ -89,7 +89,6 @@ async def run_roomba(m, a, b, c):
 
 # This was easiest solved by hand so far, with the assumption that the robot always
 # drives until it encounters a corner.
-# TODO: Solve with substrings.
 path = [
     "L,6", "R,12", "L,4", "L,6",
     "R,6", "L,6", "R,12",

@@ -15,7 +15,6 @@ inputs = puzzle.input_data
 
 @lru_cache()
 def generate_matrix(length: int):
-    # TODO: This is 10GB for the full thing, fuck.
     matrix = []
 
     logging.info("Starting matrix generation of size %dx%d", length, length)

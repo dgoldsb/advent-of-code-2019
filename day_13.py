@@ -48,7 +48,6 @@ puzzle.answer_a = counter
 
 # PART 2
 
-# TODO: Move and backwards compatibility.
 class IntDisplay:
     def __init__(self):
         self.pixels = dict()
