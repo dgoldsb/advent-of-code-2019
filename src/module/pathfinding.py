@@ -149,6 +149,12 @@ def a_star_route(
             if field == walkable:
                 walkables.append(Node(row_index, col_index))
 
+    if Node(*start) not in walkables:
+        raise ValueError(f"Start {start} is not walkable.")
+
+    if Node(*end) not in walkables:
+        raise ValueError(f"End {end} is not walkable.")
+
     graph = AStarGraph(walkables, portals)
     route = a_star(Node(*start), Node(*end), graph)
     if route:
@@ -166,11 +172,3 @@ def a_star_distance(
 ) -> typing.Union[int, None]:
     route = a_star_route(maze, start, end, walkable, portals)
     return len(route) - 1 if route else None
-
-
-def find_in_maze(target, maze):
-    """Returns first occurence."""
-    for row_index, row in enumerate(maze):
-        for col_index, field in enumerate(row):
-            if field == target:
-                return row_index, col_index
