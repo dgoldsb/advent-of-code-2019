@@ -4,8 +4,9 @@ from copy import copy
 
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.intcode_emulator import AsciiComputer
+from src.module.io import ints
 
 puzzle = Puzzle(year=2019, day=25)
 
@@ -16,14 +17,16 @@ async def run_game(moves):
     Step 2: Dump this and use these instructions as the starting point.
     Step 3: Use itertools to find out the things to drop to get past the checkpoint.
     """
-    computer = aoc.AsciiComputer(aoc.ints(Puzzle(year=2019, day=25).input_data))
+    computer = AsciiComputer(ints(Puzzle(year=2019, day=25).input_data))
 
     return await computer.run(moves)
 
 
-moves = iter([
-    # TODO: Put instructions to gather items here.
-])
+moves = iter(
+    [
+        # TODO: Put instructions to gather items here.
+    ]
+)
 moves = asyncio.run(run_game(moves))
 
 items = [

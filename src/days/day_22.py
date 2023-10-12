@@ -1,7 +1,6 @@
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
 
 puzzle = Puzzle(year=2019, day=22)
 
@@ -51,7 +50,12 @@ def parse_operations():
         except ValueError:
             arg = None
 
-        operations.append((op, arg,))
+        operations.append(
+            (
+                op,
+                arg,
+            )
+        )
 
     return operations
 
@@ -70,6 +74,7 @@ puzzle.answer_a = deck.index(2019)
 # We need to reverse engineer this one, first of all. We need to track card at index
 # 2020 to where it is after one shuffle cycle. We can see each shuffle cycle as a
 # constant operation, so here too we need to figure out a cycle.
+
 
 def r_deal_new(index, deck_size):
     return (-1 - index) % deck_size

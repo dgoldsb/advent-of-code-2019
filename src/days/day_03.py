@@ -1,20 +1,20 @@
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.common_functions import manhattan
 
 puzzle = Puzzle(year=2019, day=3)
 inputs = puzzle.input_data
 
 
 def run_command(c, p):
-    if c == 'U':
+    if c == "U":
         p[1] += 1
-    elif c == 'D':
+    elif c == "D":
         p[1] -= 1
-    elif c == 'R':
+    elif c == "R":
         p[0] += 1
-    elif c == 'L':
+    elif c == "L":
         p[0] -= 1
 
     return p
@@ -52,7 +52,7 @@ common = wire_coordinates[0].intersection(wire_coordinates[1])
 
 # PART 1
 
-distances = [aoc.manhattan((0, 0), x) for x in common]
+distances = [manhattan((0, 0), x) for x in common]
 puzzle.answer_a = min(distances)
 
 

@@ -1,7 +1,6 @@
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
 
 puzzle = Puzzle(year=2019, day=8)
 inputs = [int(x) for x in puzzle.input_data]

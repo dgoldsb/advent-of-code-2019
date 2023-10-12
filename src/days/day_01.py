@@ -1,13 +1,14 @@
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.io import ints
 
 puzzle = Puzzle(year=2019, day=1)
-inputs = aoc.ints(puzzle.input_data)
+inputs = ints(puzzle.input_data)
 
 
 # PART 1
+
 
 def find_fuel(weight: int):
     return max((weight // 3) - 2, 0)
@@ -17,6 +18,7 @@ puzzle.answer_a = sum([find_fuel(x) for x in inputs])
 
 
 # PART 2
+
 
 def find_recursive_fuel(weight: int):
     if weight < 9:

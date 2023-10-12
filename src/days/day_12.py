@@ -3,11 +3,11 @@ from copy import copy
 
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.io import ints
 
 puzzle = Puzzle(year=2019, day=12)
-inputs = aoc.ints(puzzle.input_data)
+inputs = ints(puzzle.input_data)
 
 
 class Planet:
@@ -17,7 +17,9 @@ class Planet:
 
     @property
     def total_energy(self):
-        return sum([abs(x) for x in self.position]) * sum([abs(x) for x in self.velocity])
+        return sum([abs(x) for x in self.position]) * sum(
+            [abs(x) for x in self.velocity]
+        )
 
 
 class System:
@@ -41,8 +43,9 @@ class System:
             self._apply_velocity()
             counter += 1
 
-            if [x.position[dim] for x in self.planets] == target_p and \
-                    [x.velocity[dim] for x in self.planets] == target_v:
+            if [x.position[dim] for x in self.planets] == target_p and [
+                x.velocity[dim] for x in self.planets
+            ] == target_v:
                 break
 
         print(f"Found period {counter} for {dim}")
@@ -70,7 +73,7 @@ class System:
                 planet.position[dim] += planet.velocity[dim]
 
 
-system = System([Planet(inputs[(i * 3):(i * 3) + 3]) for i in range(4)])
+system = System([Planet(inputs[(i * 3) : (i * 3) + 3]) for i in range(4)])
 
 
 # PART 1
@@ -85,9 +88,8 @@ periods = [system.find_period(0), system.find_period(1), system.find_period(2)]
 
 
 def lcm(a, b):
-    return abs(a*b) // math.gcd(a, b)
+    return abs(a * b) // math.gcd(a, b)
 
 
 first_lcm = lcm(*periods[0:2])
 puzzle.answer_b = lcm(first_lcm, periods[2])
-

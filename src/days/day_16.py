@@ -1,17 +1,17 @@
 import logging
-import numpy as np
 from functools import lru_cache
 
+import numpy as np
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
 
 puzzle = Puzzle(year=2019, day=16)
 inputs = puzzle.input_data
 
 
 # PART 1
+
 
 @lru_cache()
 def generate_matrix(length: int):
@@ -69,10 +69,11 @@ puzzle.answer_a = iterate_pattern(inputs, 100)[:8]
 # - The last value always stays the same.
 # - For v[i], index before i will ever matter, no matter how many iteration.
 
+
 def solve(subject: str, iterations: int):
     subject = [int(x) for x in subject]
     for _ in range(iterations):
-        for i in range(-2, - len(subject) - 1, -1):
+        for i in range(-2, -len(subject) - 1, -1):
             subject[i] = (subject[i] + subject[i + 1]) % 10
 
     return "".join([str(x) for x in subject])

@@ -3,8 +3,9 @@ import typing
 
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.intcode_emulator import IntcodeEmulator
+from src.module.io import ints
 
 puzzle = Puzzle(year=2019, day=21)
 
@@ -14,14 +15,14 @@ class SpringDroid:
         self.spring_script = spring_script
 
     async def run(self, walk=True):
-        intcode_script = aoc.ints(Puzzle(year=2019, day=21).input_data)
-        droid = aoc.IntcodeEmulator(intcode_script, asyncio.Queue())
+        intcode_script = ints(Puzzle(year=2019, day=21).input_data)
+        droid = IntcodeEmulator(intcode_script, asyncio.Queue())
 
         # Provide the inputs.
         run_instr = "WALK" if walk else "RUN"
-        input_string = "\n".join([
-            " ".join(x) for x in self.spring_script + [(f"{run_instr}\n",)]
-        ])
+        input_string = "\n".join(
+            [" ".join(x) for x in self.spring_script + [(f"{run_instr}\n",)]]
+        )
 
         for character in input_string:
             droid.inputs.put_nowait(ord(character))
@@ -65,19 +66,15 @@ s = [
     ("OR", "T", "J"),
     ("NOT", "C", "T"),
     ("OR", "T", "J"),
-
     # Check if there is place to stand after the landing.
     ("NOT", "E", "T"),
     ("NOT", "T", "T"),
     # Check if there is a place to jump to after landing.
     ("OR", "H", "T"),
-
     # If neither is true we hold off.
     ("AND", "T", "J"),
-
     # Check if there is a place to land.
     ("AND", "D", "J"),
-
 ]
 d = SpringDroid(s)
 outputs = asyncio.run(d.run(False))

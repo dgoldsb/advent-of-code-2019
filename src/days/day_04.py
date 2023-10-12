@@ -1,7 +1,6 @@
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
 
 puzzle = Puzzle(year=2019, day=4)
 inputs = puzzle.input_data
@@ -9,6 +8,7 @@ password_range = range(*[int(x) for x in inputs.split("-")])
 
 
 # PART 1
+
 
 def is_valid(pwd: str):
     pair_present = False
@@ -40,6 +40,7 @@ puzzle.answer_a = valid_count
 
 
 # PART 2
+
 
 def is_valid(pwd: str):
     pair_present = False

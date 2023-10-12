@@ -1,7 +1,10 @@
+import typing
+
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.io import char_array
+from src.module.pathfinding import Node, Portal, a_star_distance
 
 puzzle = Puzzle(year=2019, day=20)
 inputs = puzzle.input_data
@@ -47,16 +50,11 @@ RE....#.#                           #......RF
 UPPERS = [chr(c) for c in range(65, 91)]
 
 # Get the maze.
-maze = aoc.char_array(inputs)
+maze = char_array(inputs)
 
 
 def is_outer(loc, m):
-    return (
-        loc[0] < 4 or
-        loc[1] < 4 or
-        loc[0] > (len(m) - 4) or
-        loc[1] > (len(m[0]) - 4)
-    )
+    return loc[0] < 4 or loc[1] < 4 or loc[0] > (len(m) - 4) or loc[1] > (len(m[0]) - 4)
 
 
 def parse_portal(x, y, m):
@@ -88,9 +86,9 @@ def get_portals(m, recursive=False):
                 if name:
                     try:
                         if is_outer(loc, m):
-                            yield aoc.Portal(name, stage[name], loc, recursive)
+                            yield Portal(name, stage[name], loc, recursive)
                         else:
-                            yield aoc.Portal(name, loc, stage[name], recursive)
+                            yield Portal(name, loc, stage[name], recursive)
 
                     except KeyError:
                         stage[name] = loc
@@ -101,19 +99,19 @@ def get_portals(m, recursive=False):
 # PART 1
 
 portals = list(get_portals(maze))
-distance = aoc.a_star_distance(maze, stage["AA"], stage["ZZ"], ".", portals)
+distance = a_star_distance(maze, stage["AA"], stage["ZZ"], ".", portals)
 print(f"Answer a is {distance}")
-#puzzle.answer_a = distance
+# puzzle.answer_a = distance
 
 # PART 2
 
 portals = list(get_portals(maze, recursive=True))
-distance = aoc.a_star_distance(
+distance = a_star_distance(
     maze,
     (stage["AA"][0], stage["AA"][1], 0),
     (stage["ZZ"][0], stage["ZZ"][1], 0),
     ".",
     portals,
 )
-#puzzle.answer_b = distance
+# puzzle.answer_b = distance
 print(f"Answer b is {distance}")

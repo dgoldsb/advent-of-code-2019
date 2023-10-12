@@ -2,8 +2,8 @@ from copy import copy
 
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.io import char_array
 
 puzzle = Puzzle(year=2019, day=24)
 
@@ -56,7 +56,7 @@ def score_state(matrix):
     for m in range(len_m):
         for n in range(len_n):
             if matrix[m][n] == "#":
-                score += 2 ** power
+                score += 2**power
 
             power += 1
 
@@ -65,7 +65,7 @@ def score_state(matrix):
 
 # PART 1
 
-state = tuplify(aoc.char_array(puzzle.input_data))
+state = tuplify(char_array(puzzle.input_data))
 states = {state}
 
 while True:
@@ -95,6 +95,7 @@ class RecursiveState:
     This is essentially a doubly linked list of parent and child states. This class
     is way messier than I would like it to be, but it works.
     """
+
     def __init__(self, child=None, parent=None, starting_state=None):
         self._parent = parent
         self._child = child
@@ -153,14 +154,10 @@ class RecursiveState:
 
         if m_delta == 0:
             for m in range(5):
-                bug_counter += self.bug(
-                    m, 2 - 2 * n_delta
-                )
+                bug_counter += self.bug(m, 2 - 2 * n_delta)
         elif n_delta == 0:
             for n in range(5):
-                bug_counter += self.bug(
-                    2 - 2 * m_delta, n
-                )
+                bug_counter += self.bug(2 - 2 * m_delta, n)
 
         return bug_counter
 
@@ -173,11 +170,9 @@ class RecursiveState:
         # Create a new matrix, to avoid overwriting the old one while updating.
         new_matrix = []
         for m in range(self.len_m):
-
             # Create a new row
             new_row = []
             for n in range(self.len_n):
-
                 # If this is the recursive field, we have a special case
                 if self._state[m][n] == "?":
                     self._update_child()
@@ -214,9 +209,7 @@ class RecursiveState:
                 adjacent_bugs += self.bug(m_, n_)
 
                 if self._state[m_][n_] == "?" and c:
-                    adjacent_bugs += c.bugs_on_side(
-                        m_delta, n_delta
-                    )
+                    adjacent_bugs += c.bugs_on_side(m_delta, n_delta)
             except AssertionError:
                 if not self._parent:
                     self._parent = RecursiveState(child=self)
@@ -224,7 +217,7 @@ class RecursiveState:
                 adjacent_bugs += self._parent.bug(
                     2 + m_delta,
                     2 + n_delta,
-                    )
+                )
 
         return adjacent_bugs
 
@@ -238,7 +231,7 @@ class RecursiveState:
             self._child.update()
 
 
-state = RecursiveState(starting_state=aoc.char_array(puzzle.input_data))
+state = RecursiveState(starting_state=char_array(puzzle.input_data))
 
 for _ in range(200):
     state = state.head

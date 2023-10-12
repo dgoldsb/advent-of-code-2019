@@ -4,17 +4,19 @@ from functools import partial
 
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.intcode_emulator import IntcodeEmulator
+from src.module.io import ints
 
 puzzle = Puzzle(year=2019, day=17)
-inputs = aoc.ints(puzzle.input_data)
+inputs = ints(puzzle.input_data)
 
 
 # PART 1
 
+
 async def view():
-    sensor = aoc.IntcodeEmulator(program=inputs)
+    sensor = IntcodeEmulator(program=inputs)
 
     await sensor.run()
 
@@ -63,10 +65,11 @@ puzzle.answer_a = sum(
 
 # PART 2
 
+
 async def run_roomba(m, a, b, c):
     program = copy(inputs)
     program[0] = 2
-    roomba = aoc.IntcodeEmulator(program=program, inputs=asyncio.Queue())
+    roomba = IntcodeEmulator(program=program, inputs=asyncio.Queue())
 
     def trans(seq):
         assert len(seq) <= 20
@@ -90,16 +93,42 @@ async def run_roomba(m, a, b, c):
 # This was easiest solved by hand so far, with the assumption that the robot always
 # drives until it encounters a corner.
 path = [
-    "L,6", "R,12", "L,4", "L,6",
-    "R,6", "L,6", "R,12",
-    "R,6", "L,6", "R,12",
-    "L,6", "L,10", "L,10", "R,6",
-    "L,6", "R,12", "L,4", "L,6",
-    "R,6", "L,6", "R,12",
-    "L,6", "L,10", "L,10", "R,6",
-    "L,6", "R,12", "L,4", "L,6",
-    "R,6", "L,6", "R,12",
-    "L,6", "L,10", "L,10", "R,6",
+    "L,6",
+    "R,12",
+    "L,4",
+    "L,6",
+    "R,6",
+    "L,6",
+    "R,12",
+    "R,6",
+    "L,6",
+    "R,12",
+    "L,6",
+    "L,10",
+    "L,10",
+    "R,6",
+    "L,6",
+    "R,12",
+    "L,4",
+    "L,6",
+    "R,6",
+    "L,6",
+    "R,12",
+    "L,6",
+    "L,10",
+    "L,10",
+    "R,6",
+    "L,6",
+    "R,12",
+    "L,4",
+    "L,6",
+    "R,6",
+    "L,6",
+    "R,12",
+    "L,6",
+    "L,10",
+    "L,10",
+    "R,6",
 ]
 
 macro_a = ["L,6", "R,12", "L,4", "L,6"]

@@ -3,14 +3,16 @@ import itertools
 
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.intcode_emulator import IntcodeEmulator
+from src.module.io import ints
 
 puzzle = Puzzle(year=2019, day=7)
-inputs = aoc.ints(puzzle.input_data)
+inputs = ints(puzzle.input_data)
 
 
 # PART 1
+
 
 async def part_1():
     signals = []
@@ -22,7 +24,7 @@ async def part_1():
             queue.put_nowait(phase_setting)
             queue.put_nowait(inp)
 
-            emulator = aoc.IntcodeEmulator(program=inputs, inputs=queue)
+            emulator = IntcodeEmulator(program=inputs, inputs=queue)
             await emulator.run()
             inp = emulator.outputs.get_nowait()
 
@@ -30,10 +32,12 @@ async def part_1():
 
     return max(signals)
 
+
 puzzle.answer_a = asyncio.run(part_1())
 
 
 # PART 2
+
 
 async def part_2():
     signals = []
@@ -42,7 +46,7 @@ async def part_2():
 
         # Add amps.
         for i in range(len(permutation)):
-            amps.append(aoc.IntcodeEmulator(program=inputs, name=f"PID {i}"))
+            amps.append(IntcodeEmulator(program=inputs, name=f"PID {i}"))
 
         # Update inputs.
         for i in range(len(permutation)):

@@ -4,11 +4,12 @@ from enum import Enum
 
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.intcode_emulator import IntcodeEmulator
+from src.module.io import ints
 
 puzzle = Puzzle(year=2019, day=11)
-inputs = aoc.ints(puzzle.input_data)
+inputs = ints(puzzle.input_data)
 
 
 class Direction(Enum):
@@ -22,19 +23,19 @@ TURN_LEFT = {
     Direction.UP: Direction.LEFT,
     Direction.LEFT: Direction.DOWN,
     Direction.DOWN: Direction.RIGHT,
-    Direction.RIGHT: Direction.UP
+    Direction.RIGHT: Direction.UP,
 }
 TURN_RIGHT = {
     Direction.UP: Direction.RIGHT,
     Direction.RIGHT: Direction.DOWN,
     Direction.DOWN: Direction.LEFT,
-    Direction.LEFT: Direction.UP
+    Direction.LEFT: Direction.UP,
 }
 
 
 class PaintRobot:
     def __init__(self):
-        self._brain = aoc.IntcodeEmulator(program=inputs)
+        self._brain = IntcodeEmulator(program=inputs)
         self._direction = Direction.UP
         self._location = (0, 0)
 
@@ -106,12 +107,12 @@ class PaintRobot:
 
 async def run_paint_robot(start_color: int):
     robot = PaintRobot()
-    
+
     if start_color == 0:
         robot.black.add((0, 0))
     elif start_color == 1:
         robot.white.add((0, 0))
-        
+
     await robot.run()
 
     return robot

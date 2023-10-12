@@ -1,7 +1,7 @@
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.common_functions import compute_angle, manhattan
 
 puzzle = Puzzle(year=2019, day=10)
 inputs = puzzle.input_data.splitlines()
@@ -16,13 +16,14 @@ for y, row in enumerate(inputs):
 
 # PART 1
 
+
 def get_visible_angles(asteroid, asteroids):
     visible = set()
 
     for a in asteroids:
         try:
             # Could make this faster by counting for both asteroids.
-            visible.add(aoc.compute_angle(asteroid, a))
+            visible.add(compute_angle(asteroid, a))
         except ValueError:
             continue
 
@@ -42,14 +43,15 @@ puzzle.answer_a = largest_number_visible
 
 # PART 2
 
+
 def find_target(angle, asteroid, asteroids):
     lowest_distance = None
     closest = None
 
     for a in asteroids:
-        if aoc.compute_angle(asteroid, a) == angle:
-            if lowest_distance is None or aoc.manhattan(asteroid, a) < lowest_distance:
-                lowest_distance = aoc.manhattan(asteroid, a)
+        if compute_angle(asteroid, a) == angle:
+            if lowest_distance is None or manhattan(asteroid, a) < lowest_distance:
+                lowest_distance = manhattan(asteroid, a)
                 closest = a
 
     return closest

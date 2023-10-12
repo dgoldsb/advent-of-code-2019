@@ -2,8 +2,9 @@ import asyncio
 
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.intcode_emulator import IntcodeEmulator
+from src.module.io import ints
 
 puzzle = Puzzle(year=2019, day=23)
 
@@ -19,7 +20,7 @@ class NodeQueue(asyncio.Queue):
 
 
 class Listener:
-    def __init__(self, target: aoc.IntcodeEmulator, network):
+    def __init__(self, target: IntcodeEmulator, network):
         self._network = network
         self._target = target
 
@@ -58,7 +59,9 @@ class Network:
 
     @property
     def is_idle(self):
-        return min([x.outputs.empty() for x in self.nodes]) and min([x.inputs.empty() for x in self.nodes])
+        return min([x.outputs.empty() for x in self.nodes]) and min(
+            [x.inputs.empty() for x in self.nodes]
+        )
 
     async def _create_listeners(self):
         for node in self.nodes:
@@ -66,9 +69,8 @@ class Network:
 
     async def _create_nodes(self):
         for i in range(self._size):
-            node = aoc.IntcodeEmulator(
-                aoc.ints(Puzzle(year=2019, day=23).input_data),
-                NodeQueue()
+            node = IntcodeEmulator(
+                ints(Puzzle(year=2019, day=23).input_data), NodeQueue()
             )
             node.inputs.put_nowait(i)
             self.nodes.append(node)
@@ -93,6 +95,7 @@ asyncio.run(network.run())
 
 
 # PART 2
+
 
 class Nat:
     def __init__(self):

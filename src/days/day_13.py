@@ -3,11 +3,12 @@ from copy import copy
 
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.intcode_emulator import IntcodeEmulator
+from src.module.io import ints
 
 puzzle = Puzzle(year=2019, day=13)
-inputs = aoc.ints(puzzle.input_data)
+inputs = ints(puzzle.input_data)
 
 
 PIXEL_MAP = {
@@ -21,8 +22,9 @@ PIXEL_MAP = {
 
 # PART 1
 
+
 async def render_game():
-    emulator = aoc.IntcodeEmulator(program=inputs)
+    emulator = IntcodeEmulator(program=inputs)
     await emulator.run()
 
     outputs = []
@@ -39,7 +41,7 @@ output = asyncio.run(render_game())
 
 counter = 0
 for i in range(len(output) // 3):
-    pixel = output[(i * 3):(i * 3) + 3]
+    pixel = output[(i * 3) : (i * 3) + 3]
     if pixel[2] == 2:
         counter += 1
 
@@ -47,6 +49,7 @@ puzzle.answer_a = counter
 
 
 # PART 2
+
 
 class IntDisplay:
     def __init__(self):
@@ -80,7 +83,7 @@ class IntDisplay:
 
 
 class Arcade:
-    def __init__(self, cpu: aoc.IntcodeEmulator):
+    def __init__(self, cpu: IntcodeEmulator):
         self._cpu = cpu
         self._display = IntDisplay()
         self._state = {}
@@ -129,7 +132,7 @@ class Arcade:
     def _update_state(self, outputs):
         """Only changed pixels will be updated."""
         for index in range(len(outputs) // 3):
-            triple = outputs[(index * 3):(index * 3) + 3]
+            triple = outputs[(index * 3) : (index * 3) + 3]
             self._state[tuple(triple[0:2])] = triple[2]
 
 
@@ -138,7 +141,7 @@ async def play_game():
     program[0] = 2
     queue = asyncio.Queue()
 
-    emulator = aoc.IntcodeEmulator(program=program, inputs=queue)
+    emulator = IntcodeEmulator(program=program, inputs=queue)
     arcade = Arcade(emulator)
 
     async def solve():

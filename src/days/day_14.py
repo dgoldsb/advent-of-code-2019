@@ -5,8 +5,7 @@ from math import ceil
 
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
 
 puzzle = Puzzle(year=2019, day=14)
 inputs = puzzle.input_data.splitlines()
@@ -114,6 +113,7 @@ puzzle.answer_a = calculate_ore_required(1)
 
 
 # PART 2
+
 
 def binary_search(l, u, t, p):
     m = (u - l) // 2 + l

@@ -3,40 +3,44 @@ from functools import lru_cache
 
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.io import char_array
+from src.module.pathfinding import a_star_distance, a_star_route, find_in_maze
 
 puzzle = Puzzle(year=2019, day=18)
 inputs = puzzle.input_data
 
 # Get the maze.
-maze = aoc.char_array(inputs)
+maze = char_array(inputs)
 
 # Find the relevant locations.
 valid_keys = [chr(x) for x in range(ord("a"), ord("z") + 1) if chr(x) in inputs]
-DOOR_LOCATIONS = {k.upper(): aoc.find_in_maze(k.upper(), maze) for k in valid_keys}
+DOOR_LOCATIONS = {k.upper(): find_in_maze(k.upper(), maze) for k in valid_keys}
 DOOR_LOCATIONS_INVERSE = {v: k for k, v in DOOR_LOCATIONS.items()}
-KEY_LOCATIONS = {k: aoc.find_in_maze(k, maze) for k in valid_keys}
-start_location = aoc.find_in_maze("@", maze)
+KEY_LOCATIONS = {k: find_in_maze(k, maze) for k in valid_keys}
+start_location = find_in_maze("@", maze)
 
 # Make the keys and the starting location walkable.
-for loc in list(KEY_LOCATIONS.values()) + list(DOOR_LOCATIONS.values()) + [start_location]:
+for loc in (
+    list(KEY_LOCATIONS.values()) + list(DOOR_LOCATIONS.values()) + [start_location]
+):
     if loc is not None:
         maze[loc[0]][loc[1]] = "."
 
 MAZE = maze
 
+
 # Cache all path lengths.
 @lru_cache(len(valid_keys) ** 2)
 def find_path_length(lc, tg):
-    return aoc.a_star_distance(MAZE, lc, tg, ".")
+    return a_star_distance(MAZE, lc, tg, ".")
 
 
 # Cache all the keys needed to unlock each target.
 BLOCKERS = defaultdict(lambda: set())
 
 for key in valid_keys:
-    path = aoc.a_star_route(MAZE, start_location, KEY_LOCATIONS[key], ".")
+    path = a_star_route(MAZE, start_location, KEY_LOCATIONS[key], ".")
     for loc in path:
         try:
             BLOCKERS[key].add(DOOR_LOCATIONS_INVERSE[loc].lower())
@@ -46,7 +50,7 @@ for key in valid_keys:
 
 # Use the cached results to do part 1.
 # TODO: We are repeating generic base cases a lot, dynamic programming?
-@lru_cache(10 ** 6)
+@lru_cache(10**6)
 def part_1(start, missing):
     if len(missing) == 1:
         key = list(missing)[0]
@@ -70,7 +74,7 @@ def part_1(start, missing):
             paths.append(path_part + path_rest)
 
         shortest_path = None
-        shortest_length = 10 ** 4
+        shortest_length = 10**4
         for pt in paths:
             try:
                 if sum([x[0] for x in path]) < shortest_length:

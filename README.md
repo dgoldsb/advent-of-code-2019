@@ -15,3 +15,12 @@ All solutions import the `aoc.py` file for common functions.
 Upon importing this file, a file `session_cookie` is expected in the root of this repository.
 This file should contain the session cookie that the Advent of Code website provides you after authenticating. Using this cookie, inputs are automatically fetched, and in some cases solutions are automatically submitted.
 The only dependency for this project is `advent-of-code-data`, the Python version used is `3.7`.
+
+## TODO
+
+- [ ] Formatter
+- [ ] Run all entrypoint
+- [ ] Split old code
+- [ ] Speed up dy 15
+- [ ] Day 16 without numpy
+- [ ] Clean up later day solutions

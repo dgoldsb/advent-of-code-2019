@@ -5,11 +5,12 @@ from queue import Queue
 
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.intcode_emulator import IntcodeEmulator
+from src.module.io import ints
 
 puzzle = Puzzle(year=2019, day=15)
-inputs = aoc.ints(puzzle.input_data)
+inputs = ints(puzzle.input_data)
 
 
 class RepairRoomba:
@@ -20,7 +21,7 @@ class RepairRoomba:
         self.program = program
 
     async def _move(self, direction):
-        self._brain: aoc.IntcodeEmulator
+        self._brain: IntcodeEmulator
 
         logging.debug("Moving in direction %d", direction)
         await self._brain.inputs.put(direction)
@@ -45,7 +46,7 @@ class RepairRoomba:
         return output
 
     async def run(self, commands, init=None):
-        self._brain = aoc.IntcodeEmulator(self.program, asyncio.Queue())
+        self._brain = IntcodeEmulator(self.program, asyncio.Queue())
         event_loop = asyncio.create_task(self._brain.run())
         did_loop = False
         path = set()
@@ -53,7 +54,6 @@ class RepairRoomba:
         if init is not None:
             for command in init:
                 await self._move(command)
-
 
         for command in commands:
             path.add(self.position)
@@ -68,6 +68,7 @@ class RepairRoomba:
 
 
 # PART 1
+
 
 def bfs():
     roomba = RepairRoomba(inputs)
@@ -96,6 +97,7 @@ puzzle.answer_a = len(bfs_result)
 
 
 # PART 2
+
 
 def modified_bfs(initialize_commands):
     roomba = RepairRoomba(inputs)

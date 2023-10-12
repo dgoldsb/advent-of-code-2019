@@ -2,17 +2,18 @@ import asyncio
 
 from aocd.models import Puzzle
 
-import aoc
-
+import src.module.io  # set the session cookie
+from src.module.intcode_emulator import IntcodeEmulator
+from src.module.io import ints
 
 puzzle = Puzzle(year=2019, day=5)
-inputs = aoc.ints(puzzle.input_data)
+inputs = ints(puzzle.input_data)
 
 
 async def do_part(i: int):
     queue = asyncio.Queue()
     queue.put_nowait(i)
-    emulator = aoc.IntcodeEmulator(program=inputs, inputs=queue)
+    emulator = IntcodeEmulator(program=inputs, inputs=queue)
     await emulator.run()
 
     while True:
