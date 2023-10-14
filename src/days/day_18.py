@@ -26,9 +26,13 @@ class IndexNotFoundError(Exception):
 
 
 class Maze:
-    def __init__(self, raw_maze):
+    def __init__(self, key_coordinates: dict[str, tuple[int, int]], door_coordinates: dict[str, tuple[int, int]], maze: list[list[str]]):
         self.__raw_maze = raw_maze
         self.__array_maze = char_array(raw_maze)
+
+    @classmethod
+    def from_string(cls, string: str):
+        return cls(string)
 
     def find_first_index(self, char: str) -> typing.Tuple[int, int]:
         for row_index, row in enumerate(self.__array_maze):
