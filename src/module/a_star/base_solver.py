@@ -51,7 +51,7 @@ class BaseSolver(Generic[StateType, NodeType]):
         raise NotImplementedError()
 
     @staticmethod
-    def heuristic(node: NodeStateType, end: NodeStateType) -> float:
+    def heuristic(node: NodeType, end: NodeStateType) -> float:
         raise NotImplementedError
 
     @staticmethod
@@ -63,7 +63,7 @@ class BaseSolver(Generic[StateType, NodeType]):
         # Initialize the open and closed lists.
         open_list: list[tuple[float, NodeStateType]] = []
         open_set: set[NodeStateType] = set()
-        closed_list: set[NodeStateType] = set()
+        closed_set: set[NodeStateType] = set()
 
         # Initialize the came from, g score and f score.
         came_from: dict[NodeStateType, NodeStateType] = {}
@@ -79,6 +79,7 @@ class BaseSolver(Generic[StateType, NodeType]):
 
         # Loop until the open list is empty.
         while open_list:
+            print(len(closed_set))
             current_node_state = heappop(open_list)[1]
             open_set.remove(current_node_state)
             current_state, current_node = current_node_state
@@ -88,7 +89,7 @@ class BaseSolver(Generic[StateType, NodeType]):
                 return self._reconstruct_path((current_state, current_node), came_from)
 
             # Add the current node to the closed list.
-            closed_list.add((current_state, current_node))
+            closed_set.add((current_state, current_node))
 
             # Loop through the neighbours of the current node.
             for neighbour, distance in self.get_neighbours(current_node_state):
@@ -98,7 +99,7 @@ class BaseSolver(Generic[StateType, NodeType]):
                 neighbour_node_state = (neighbour_state, neighbour)
 
                 # Check if the neighbour is already in the closed list.
-                if neighbour in closed_list:
+                if neighbour in closed_set:
                     continue
 
                 # Calculate the tentative g score.
