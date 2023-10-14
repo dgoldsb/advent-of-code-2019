@@ -42,12 +42,11 @@ class BaseSolver(Generic[StateType, NodeType]):
         for neighbour in node.neighbors():
             yield neighbour, 1
 
-    @staticmethod
-    def get_empty_state() -> StateType:
+    def get_empty_states(self) -> list[StateType]:
         raise NotImplementedError()
 
     @staticmethod
-    def update_state(state: StateType, current_node: NodeType, new_node: NodeType) -> StateType:
+    def update_states(state: StateType, current_node: NodeType, new_node: NodeType) -> list[StateType]:
         raise NotImplementedError()
 
     @staticmethod
@@ -71,15 +70,15 @@ class BaseSolver(Generic[StateType, NodeType]):
         f_score : dict[NodeStateType, float] = {}
 
         # Add the start node to the open list.
-        starting_state = (self.get_empty_state(), start)
-        heappush(open_list, (0.0, starting_state))
-        open_set.add(starting_state)
-        g_score[starting_state] = 0.0
-        f_score[starting_state] = 0.0
+        starting_states = [(state, start) for state in self.get_empty_states()]
+        for starting_state in starting_states:
+            heappush(open_list, (0.0, starting_state))
+            open_set.add(starting_state)
+            g_score[starting_state] = 0.0
+            f_score[starting_state] = 0.0
 
         # Loop until the open list is empty.
         while open_list:
-            print(len(closed_set))
             current_node_state = heappop(open_list)[1]
             open_set.remove(current_node_state)
             current_state, current_node = current_node_state
@@ -93,30 +92,28 @@ class BaseSolver(Generic[StateType, NodeType]):
 
             # Loop through the neighbours of the current node.
             for neighbour, distance in self.get_neighbours(current_node_state):
-                if neighbour is None:
-                    ...
-                neighbour_state = self.update_state(current_state, current_node, neighbour)
-                neighbour_node_state = (neighbour_state, neighbour)
+                for neighbour_state in self.update_states(current_state, current_node, neighbour):
+                    neighbour_node_state = (neighbour_state, neighbour)
 
-                # Check if the neighbour is already in the closed list.
-                if neighbour in closed_set:
-                    continue
+                    # Check if the neighbour is already in the closed list.
+                    if neighbour in closed_set:
+                        continue
 
-                # Calculate the tentative g score.
-                tentative_g_score = g_score[current_node_state] + distance
-                tentative_f_score = tentative_g_score + self.heuristic(neighbour, end)
+                    # Calculate the tentative g score.
+                    tentative_g_score = g_score[current_node_state] + distance
+                    tentative_f_score = tentative_g_score + self.heuristic(neighbour, end)
 
-                # Check if the neighbour is already in the open list.
-                if tentative_g_score >= g_score.get(neighbour_node_state, float("inf")):
-                    continue
+                    # Check if the neighbour is already in the open list.
+                    if tentative_g_score >= g_score.get(neighbour_node_state, float("inf")):
+                        continue
 
-                # Update the came from and scores.
-                came_from[neighbour_node_state] = current_node_state
-                g_score[neighbour_node_state] = tentative_g_score
-                f_score[neighbour_node_state] = tentative_f_score
+                    # Update the came from and scores.
+                    came_from[neighbour_node_state] = current_node_state
+                    g_score[neighbour_node_state] = tentative_g_score
+                    f_score[neighbour_node_state] = tentative_f_score
 
-                if neighbour_node_state not in open_set:
-                    heappush(open_list, (tentative_f_score, neighbour_node_state))
-                    open_set.add(neighbour_node_state)
+                    if neighbour_node_state not in open_set:
+                        heappush(open_list, (tentative_f_score, neighbour_node_state))
+                        open_set.add(neighbour_node_state)
 
         raise RuntimeError("Could not find a path")

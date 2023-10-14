@@ -13,9 +13,9 @@ class BaseGraphBuilder(Generic[NodeType]):
     def _parse_nodes(self):
         raise NotImplementedError()
 
-    def _get_start(self) -> NodeType:
+    def _get_starts(self) -> list[NodeType]:
         raise NotImplementedError()
 
-    def build(self) -> NodeType:
+    def build(self) -> list[NodeType]:
         self._parse_nodes()
-        return self._get_start()
+        return self._get_starts()

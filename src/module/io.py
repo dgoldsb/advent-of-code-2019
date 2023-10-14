@@ -7,7 +7,7 @@ import re
 import sys
 import typing
 
-with open("../../session_cookie") as f:
+with open(f"{os.path.dirname(__file__)}/../../session_cookie") as f:
     session = f.readline().strip()
 
 os.environ["AOC_SESSION"] = session
