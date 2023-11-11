@@ -60,8 +60,8 @@ class PortalMazeBuilder(BaseGraphBuilder[PortalMazeNode]):
             ]:
                 xy_modified_coordinate = (x, y)
                 if xy_modified_coordinate in self.__node_map:
-                    neighbour = self.__node_map[xy_modified_coordinate]
-                    node.add_neighbour(neighbour)
+                    neighbor = self.__node_map[xy_modified_coordinate]
+                    node.add_neighbor(neighbor)
 
     def _get_starts(self) -> list[PortalMazeNode]:
         return [
@@ -75,8 +75,8 @@ class PortalMazeBuilder(BaseGraphBuilder[PortalMazeNode]):
             portal_b = self.__node_map[portal[1]]
             if portal_a == portal_b:
                 continue
-            portal_a.add_neighbour(portal_b)
-            portal_b.add_neighbour(portal_a)
+            portal_a.add_neighbor(portal_b)
+            portal_b.add_neighbor(portal_a)
 
     def _parse_nodes(self):
         self.__build_nodes()

@@ -36,13 +36,13 @@ class BaseSolver(Generic[StateType, NodeType]):
         return len(path)
 
     @staticmethod
-    def get_neighbours(
+    def get_neighbors(
         node_state: NodeStateType,
     ) -> Generator[tuple[NodeType, int], None, None]:
-        """Get the neighbours of the current node."""
+        """Get the neighbors of the current node."""
         _, node = node_state
-        for neighbour in node.neighbors():
-            yield neighbour, 1
+        for neighbor in node.neighbors():
+            yield neighbor, 1
 
     def get_empty_states(self) -> list[StateType]:
         raise NotImplementedError()
@@ -58,8 +58,8 @@ class BaseSolver(Generic[StateType, NodeType]):
         raise NotImplementedError
 
     @staticmethod
-    def is_destination(node: NodeType, end: NodeType) -> bool:
-        return node == end
+    def is_destination(node: NodeStateType, end: NodeType) -> bool:
+        return node[1] == end
 
     def solve(self, start: NodeType, end: NodeType) -> list[NodeStateType]:
         """Solve the graph with A* algorithm."""
@@ -88,42 +88,42 @@ class BaseSolver(Generic[StateType, NodeType]):
             current_state, current_node = current_node_state
 
             # Check if we have reached the end node.
-            if self.is_destination(current_node, end):
+            if self.is_destination(current_node_state, end):
                 return self._reconstruct_path((current_state, current_node), came_from)
 
             # Add the current node to the closed list.
             closed_set.add((current_state, current_node))
 
-            # Loop through the neighbours of the current node.
-            for neighbour, distance in self.get_neighbours(current_node_state):
-                for neighbour_state in self.update_states(
-                    current_state, current_node, neighbour
+            # Loop through the neighbors of the current node.
+            for neighbor, distance in self.get_neighbors(current_node_state):
+                for neighbor_state in self.update_states(
+                    current_state, current_node, neighbor
                 ):
-                    neighbour_node_state = (neighbour_state, neighbour)
+                    neighbor_node_state = (neighbor_state, neighbor)
 
-                    # Check if the neighbour is already in the closed list.
-                    if neighbour in closed_set:
+                    # Check if the neighbor is already in the closed list.
+                    if neighbor in closed_set:
                         continue
 
                     # Calculate the tentative g score.
                     tentative_g_score = g_score[current_node_state] + distance
                     tentative_f_score = tentative_g_score + self.heuristic(
-                        neighbour, end
+                        neighbor, end
                     )
 
-                    # Check if the neighbour is already in the open list.
+                    # Check if the neighbor is already in the open list.
                     if tentative_g_score >= g_score.get(
-                        neighbour_node_state, float("inf")
+                        neighbor_node_state, float("inf")
                     ):
                         continue
 
                     # Update the came from and scores.
-                    came_from[neighbour_node_state] = current_node_state
-                    g_score[neighbour_node_state] = tentative_g_score
-                    f_score[neighbour_node_state] = tentative_f_score
+                    came_from[neighbor_node_state] = current_node_state
+                    g_score[neighbor_node_state] = tentative_g_score
+                    f_score[neighbor_node_state] = tentative_f_score
 
-                    if neighbour_node_state not in open_set:
-                        heappush(open_list, (tentative_f_score, neighbour_node_state))
-                        open_set.add(neighbour_node_state)
+                    if neighbor_node_state not in open_set:
+                        heappush(open_list, (tentative_f_score, neighbor_node_state))
+                        open_set.add(neighbor_node_state)
 
         raise RuntimeError("Could not find a path")

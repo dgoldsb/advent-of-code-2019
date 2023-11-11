@@ -59,20 +59,22 @@ class KeyMazeSolver(BaseSolver[SolutionState, tuple[KeyMazeNode, ...]]):
 
     @staticmethod
     def heuristic(
-        node: tuple[KeyMazeNode, ...], end: (SolutionState, tuple[KeyMazeNode, ...])
+        node: tuple[KeyMazeNode, ...],
+        end: tuple[SolutionState, tuple[KeyMazeNode, ...]],
     ) -> float:
         return -sum(n.z for n in node)
 
     @staticmethod
     def is_destination(
-        node: tuple[KeyMazeNode, ...], end: tuple[KeyMazeNode, ...]
+        node: tuple[SolutionState, tuple[KeyMazeNode, ...]],
+        end: tuple[KeyMazeNode, ...],
     ) -> bool:
         """We consider the destination reached when we are on the same z level.
 
         This is a bit hacky, but a way for us to circumvent the fact that we don't know the destination node, just the
         destination z-level.
         """
-        return sum(n.z for n in node) == end[0].z
+        return sum(n.z for n in node[1]) == end[0].z
 
     @staticmethod
     def evaluate_path_length(

@@ -16,3 +16,5 @@ solver = PortalMazeSolver()
 puzzle.answer_a = solver.evaluate_path_length(solver.solve(start, destination))
 
 # PART 2
+solver = PortalMazeSolver(True)
+puzzle.answer_b = solver.evaluate_path_length(solver.solve(start, destination))

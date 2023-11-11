@@ -7,15 +7,15 @@ class BaseNode:
         self.y = y
         self.z = z
 
-        self.__neighbours = []
+        self.__neighbors = []
 
     def neighbors(self) -> Generator[tuple["BaseNode", int], None, None]:
         # Return the adjacent nodes.
-        for neighbour in self.__neighbours:
-            yield neighbour, 1
+        for neighbor in self.__neighbors:
+            yield neighbor, 1
 
-    def add_neighbour(self, neighbour: "BaseNode"):
-        self.__neighbours.append(neighbour)
+    def add_neighbor(self, neighbor: "BaseNode"):
+        self.__neighbors.append(neighbor)
 
     def __hash__(self):
         return hash((self.x, self.y, self.z))
