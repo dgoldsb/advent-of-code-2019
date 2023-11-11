@@ -38,21 +38,21 @@ class KeyMazeSolver(BaseSolver[SolutionState, tuple[KeyMazeNode, ...]]):
         return [state]
 
     @staticmethod
-    def get_neighbours(
+    def get_neighbors(
         node_state: tuple[SolutionState, tuple[KeyMazeNode, ...]]
     ) -> Generator[tuple[tuple[KeyMazeNode, ...], int], None, None]:
         state, node_tuple = node_state
 
         for i, node in enumerate(node_tuple):
-            # Only produce neighbours for the beelining index.
+            # Only produce neighbors for the beelining index.
             if i != state.beelining_index:
                 continue
 
-            for neighbour in node.neighbors_with_state(state):
+            for neighbor in node.neighbors_with_state(state):
                 node_list = []
                 for j in range(len(node_tuple)):
                     if i == j:
-                        node_list.append(neighbour[0])
+                        node_list.append(neighbor[0])
                     else:
                         node_list.append(node_tuple[j])
                 yield tuple(node_list), 1

@@ -11,9 +11,9 @@ class KeyMazeNode(BaseNode):
         # Persist the value of this node. It may be a key or door!
         self.value = value
 
-        # Some special neighbours.
-        self.z_neighbour: Optional["KeyMazeNode"] = None
-        self.door_neighbours: list[tuple[str, "KeyMazeNode"]] = []
+        # Some special neighbors.
+        self.z_neighbor: Optional["KeyMazeNode"] = None
+        self.door_neighbors: list[tuple[str, "KeyMazeNode"]] = []
 
     def is_key(self) -> bool:
         """Is there still a key on this node?"""
@@ -32,12 +32,12 @@ class KeyMazeNode(BaseNode):
         # If this node is a key and the key was not picked up, we need to go in the z direction.
         if self.is_key():
             if self.value not in state.unlocked_keys:
-                yield self.z_neighbour, 0
+                yield self.z_neighbor, 0
                 return
 
         # Return the adjacent doors, only if the key was picked up.
-        for door, neighbour in self.door_neighbours:
-            if not neighbour.is_door(state):
-                yield neighbour, 1
+        for door, neighbor in self.door_neighbors:
+            if not neighbor.is_door(state):
+                yield neighbor, 1
 
         yield from super().neighbors()

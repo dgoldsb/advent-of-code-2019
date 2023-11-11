@@ -24,7 +24,7 @@ class KeyMazeBuilder(BaseGraphBuilder[KeyMazeNode]):
             # Connect the nodes in the z direction.
             z_modified_coordinate = (node.x, node.y, node.z + 1)
             if z_modified_coordinate in self.__node_map:
-                node.z_neighbour = self.__node_map[z_modified_coordinate]
+                node.z_neighbor = self.__node_map[z_modified_coordinate]
 
             # Connect the nodes in the x and y direction.
             clean_state = SolutionState(tuple(), 0)
@@ -36,11 +36,11 @@ class KeyMazeBuilder(BaseGraphBuilder[KeyMazeNode]):
             ]:
                 xy_modified_coordinate = (x, y, node.z)
                 if xy_modified_coordinate in self.__node_map:
-                    neighbour = self.__node_map[xy_modified_coordinate]
-                    if neighbour.is_door(clean_state):
-                        node.door_neighbours.append((neighbour.value, neighbour))
+                    neighbor = self.__node_map[xy_modified_coordinate]
+                    if neighbor.is_door(clean_state):
+                        node.door_neighbors.append((neighbor.value, neighbor))
                     else:
-                        node.add_neighbour(neighbour)
+                        node.add_neighbor(neighbor)
 
     def _get_starts(self) -> list[KeyMazeNode]:
         starts = set()
