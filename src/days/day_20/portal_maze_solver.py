@@ -47,9 +47,5 @@ class PortalMazeSolver(BaseSolver[SolutionState, PortalMazeNode]):
     def is_destination(
         node: tuple[SolutionState, PortalMazeNode], end: PortalMazeNode
     ) -> bool:
-        """We consider the destination reached when we are on the same z level.
-
-        This is a bit hacky, but a way for us to circumvent the fact that we don't know the destination node, just the
-        destination z-level.
-        """
+        """We consider the destination reached when we are at the end at 0 recursion."""
         return node[1] == end and node[0].recursion_depth == 0
