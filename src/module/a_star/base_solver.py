@@ -33,10 +33,12 @@ class BaseSolver(Generic[StateType, NodeType]):
     @staticmethod
     def evaluate_path_length(path: list[NodeStateType]) -> int:
         """Evaluate the length of the path."""
-        return len(path) - path[0][1].z
+        return len(path)
 
     @staticmethod
-    def get_neighbours(node_state: NodeStateType) -> Generator[tuple[NodeType, int], None, None]:
+    def get_neighbours(
+        node_state: NodeStateType,
+    ) -> Generator[tuple[NodeType, int], None, None]:
         """Get the neighbours of the current node."""
         _, node = node_state
         for neighbour in node.neighbors():
@@ -46,7 +48,9 @@ class BaseSolver(Generic[StateType, NodeType]):
         raise NotImplementedError()
 
     @staticmethod
-    def update_states(state: StateType, current_node: NodeType, new_node: NodeType) -> list[StateType]:
+    def update_states(
+        state: StateType, current_node: NodeType, new_node: NodeType
+    ) -> list[StateType]:
         raise NotImplementedError()
 
     @staticmethod
@@ -67,7 +71,7 @@ class BaseSolver(Generic[StateType, NodeType]):
         # Initialize the came from, g score and f score.
         came_from: dict[NodeStateType, NodeStateType] = {}
         g_score: dict[NodeStateType, float] = {}
-        f_score : dict[NodeStateType, float] = {}
+        f_score: dict[NodeStateType, float] = {}
 
         # Add the start node to the open list.
         starting_states = [(state, start) for state in self.get_empty_states()]
@@ -92,7 +96,9 @@ class BaseSolver(Generic[StateType, NodeType]):
 
             # Loop through the neighbours of the current node.
             for neighbour, distance in self.get_neighbours(current_node_state):
-                for neighbour_state in self.update_states(current_state, current_node, neighbour):
+                for neighbour_state in self.update_states(
+                    current_state, current_node, neighbour
+                ):
                     neighbour_node_state = (neighbour_state, neighbour)
 
                     # Check if the neighbour is already in the closed list.
@@ -101,10 +107,14 @@ class BaseSolver(Generic[StateType, NodeType]):
 
                     # Calculate the tentative g score.
                     tentative_g_score = g_score[current_node_state] + distance
-                    tentative_f_score = tentative_g_score + self.heuristic(neighbour, end)
+                    tentative_f_score = tentative_g_score + self.heuristic(
+                        neighbour, end
+                    )
 
                     # Check if the neighbour is already in the open list.
-                    if tentative_g_score >= g_score.get(neighbour_node_state, float("inf")):
+                    if tentative_g_score >= g_score.get(
+                        neighbour_node_state, float("inf")
+                    ):
                         continue
 
                     # Update the came from and scores.

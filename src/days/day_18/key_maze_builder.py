@@ -28,7 +28,12 @@ class KeyMazeBuilder(BaseGraphBuilder[KeyMazeNode]):
 
             # Connect the nodes in the x and y direction.
             clean_state = SolutionState(tuple(), 0)
-            for x, y in [(node.x + 1, node.y), (node.x - 1, node.y), (node.x, node.y + 1), (node.x, node.y - 1)]:
+            for x, y in [
+                (node.x + 1, node.y),
+                (node.x - 1, node.y),
+                (node.x, node.y + 1),
+                (node.x, node.y - 1),
+            ]:
                 xy_modified_coordinate = (x, y, node.z)
                 if xy_modified_coordinate in self.__node_map:
                     neighbour = self.__node_map[xy_modified_coordinate]

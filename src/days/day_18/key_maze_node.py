@@ -21,9 +21,14 @@ class KeyMazeNode(BaseNode):
 
     def is_door(self, state: SolutionState) -> bool:
         """Is there still a door on this node?"""
-        return self.value in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" and self.value.lower() not in state.unlocked_keys
+        return (
+            self.value in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            and self.value.lower() not in state.unlocked_keys
+        )
 
-    def neighbors_with_state(self, state: SolutionState) -> Generator[tuple["KeyMazeNode", int], None, None]:
+    def neighbors_with_state(
+        self, state: SolutionState
+    ) -> Generator[tuple["KeyMazeNode", int], None, None]:
         # If this node is a key and the key was not picked up, we need to go in the z direction.
         if self.is_key():
             if self.value not in state.unlocked_keys:

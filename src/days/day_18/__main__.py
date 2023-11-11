@@ -39,5 +39,7 @@ def turn_into_b_input(a_input):
 builder = KeyMazeBuilder(turn_into_b_input(inputs))
 destination = KeyMazeNode(0, 0, builder.count_keys(), "!")
 starts = tuple(builder.build())
-solution_b = solver.evaluate_path_length(KeyMazeSolver(len(starts)).solve(starts, (destination,)))
+solution_b = solver.evaluate_path_length(
+    KeyMazeSolver(len(starts)).solve(starts, (destination,))
+)
 puzzle.answer_b = solution_b
