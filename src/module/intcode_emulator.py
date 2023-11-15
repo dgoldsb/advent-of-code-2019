@@ -2,7 +2,9 @@
 import asyncio
 import logging
 import typing
+from asyncio import CancelledError
 from copy import copy
+from dataclasses import dataclass
 
 
 class IntcodeEmulator:
@@ -16,7 +18,7 @@ class IntcodeEmulator:
         self.name = name
         self.outputs = asyncio.Queue()
         self.terminated = False
-        self.waiting = False
+        self.wants_input = asyncio.Event()
 
     @property
     def state(self):
@@ -104,7 +106,9 @@ class IntcodeEmulator:
             self._pointer += 4
         elif opcode == 3:
             # input
+            self.wants_input.set()
             inp = await self.inputs.get()
+            self.wants_input.clear()
             logging.debug("%s: GET %s", self.name, inp)
             self._store_parameter(1, inp)
             self._pointer += 2
@@ -149,70 +153,60 @@ class IntcodeEmulator:
             )
 
 
-class AsciiComputerExit(Exception):
-    pass
+@dataclass(frozen=True)
+class IntcodeState:
+    pointer: int
+    relative_base: int
+    state: tuple[int, ...]
 
 
 class AsciiComputer:
-    def __init__(self, program):
-        self._emulator = None
-        self._io_history = []
-        self._program = program
+    """Static computer that is fed an intcode state and returns state and screen at the next possible input."""
 
-    async def give_input(self, inputs: str):
-        assert isinstance(self._emulator, IntcodeEmulator)
+    @staticmethod
+    def process_state(state: IntcodeState, next_input: str) -> tuple[IntcodeState, str]:
+        """Process the state with the next input."""
+        emulator = IntcodeEmulator(list(state.state), asyncio.Queue())
+        emulator._pointer = state.pointer
+        emulator._relative_base = state.relative_base
 
-        if inputs == "exit":
-            raise AsciiComputerExit
-        else:
-            self._io_history.append(inputs)
+        # Prepare input.
+        for char in next_input:
+            emulator.inputs.put_nowait(ord(char))
+        emulator.inputs.put_nowait(ord("\n"))
 
-            for char in inputs:
-                self._emulator.inputs.put_nowait(ord(char))
+        # Run the emulator.
+        asyncio.run(AsciiComputer._run_to_next_command(emulator))
 
-            await self._emulator.inputs.put(ord("\n"))
+        # Render.
+        render = AsciiComputer._render(emulator)
 
-    def render(self):
-        assert isinstance(self._emulator, IntcodeEmulator)
+        return (
+            IntcodeState(
+                emulator._pointer, emulator._relative_base, tuple(emulator.state)
+            ),
+            render,
+        )
 
-        outputs = []
-        while not self._emulator.outputs.empty():
-            outputs.append(self._emulator.outputs.get_nowait())
-
-        image = [chr(x) for x in outputs]
-        print("".join(image))
-        return image
-
-    async def io_loop(self, instructions):
-        last_render = self.render()
-
-        while not self._emulator.terminated:
-            if last_render:
-                try:
-                    i = next(instructions)
-                except StopIteration:
-                    i = input("Give a command: ")
-
-                await self.give_input(i)
-            else:
-                await asyncio.sleep(1)
-
-            last_render = self.render()
-
-    async def run(self, instructions=None):
-        self._emulator = IntcodeEmulator(self._program, asyncio.Queue())
-
-        # TODO: make this an iterable that is iterated over...
-        # TODO: make the thing raise an error if the door test is failed.
-        # TODO: use itertools to try all drop combinations, see where no error is
-        #  raised by following with an exit.
-
-        instructions = instructions or iter([])
-        tasks = [self._emulator.run(), self.io_loop(instructions)]
-
+    @staticmethod
+    async def _run_to_next_command(emulator: IntcodeEmulator):
+        task = asyncio.create_task(emulator.run())
+        render = AsciiComputer._render(emulator)
         try:
-            await asyncio.gather(*tasks)
-        except AsciiComputerExit:
+            # TODO: WHY TIMEOUT?
+            await asyncio.wait_for(emulator.wants_input.wait(), timeout=0.1)
+        except asyncio.TimeoutError:
+            pass
+        task.cancel()
+        try:
+            await task
+        except CancelledError:
             pass
 
-        return self._io_history
+    @staticmethod
+    def _render(emulator: IntcodeEmulator) -> str:
+        outputs = []
+        while not emulator.outputs.empty():
+            outputs.append(emulator.outputs.get_nowait())
+        image = [chr(x) for x in outputs]
+        return "".join(image)
