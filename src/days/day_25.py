@@ -1,5 +1,3 @@
-import asyncio
-import itertools
 from copy import copy
 from dataclasses import dataclass
 from typing import Generator
@@ -15,7 +13,7 @@ puzzle = Puzzle(year=2019, day=25)
 
 @dataclass(frozen=True)
 class GameState:
-    items: tuple[str]
+    items: tuple[str, ...]
     room: str
 
 
@@ -28,16 +26,15 @@ class GamePlayingEngine:
         first_state = GameState(tuple(), first_room)
 
         self.__visited_states = set()
-
-        # TODO: Hash might not work, use sorted items and location instead
         self.__state_pool: set[GameState] = {first_state}
         self.__state_emulator_map: dict[GameState, IntcodeState] = {
             first_state: first_emulator
         }
         self.__state_item_map: dict[GameState, set[str]] = {first_state: set()}
         self.__state_screen_map: dict[GameState, str] = {first_state: first_screen}
+        # We need to cache possible moves once we pick something up as the pickup confirmation does not echo possible
+        # moves.
         self.__take_move_cache = {}
-        self.__drop_move_cache = {}
 
     @staticmethod
     def __parse_room(screen: str):
@@ -47,7 +44,7 @@ class GamePlayingEngine:
         else:
             raise ValueError("No room found")
 
-    def solve(self):
+    def solve(self) -> int:
         while self.__state_pool:
             state = self.__state_pool.pop()
             screen = self.__state_screen_map[state]
@@ -56,12 +53,9 @@ class GamePlayingEngine:
 
             possible_moves = list(self.get_possible_moves(screen, items))
 
-            # If there is no direction move...
-            if all(move[0].startswith("drop") for move in possible_moves):
-                try:
-                    possible_moves = self.__take_move_cache.pop(state)
-                except KeyError:
-                    possible_moves = self.__drop_move_cache.pop(state)
+            # If there is no direction move we probably just took something, meaning the screen prints nothing.
+            if not possible_moves:
+                possible_moves = self.__take_move_cache.pop(state)
 
             for move, new_items in possible_moves:
                 new_emulator, new_screen = AsciiComputer.process_state(emulator, move)
@@ -70,6 +64,7 @@ class GamePlayingEngine:
                 except ValueError:
                     room = state.room
 
+                # This clause took some trial and error, sue me.
                 if room == "Pressure-Sensitive Floor":
                     if (
                         "Alert! Droids on this ship are heavier than the detected value!"
@@ -82,9 +77,11 @@ class GamePlayingEngine:
                     ):
                         pass
                     else:
-                        print(new_screen)
-                        print("\n\n\n")
-                        raise ValueError("Donfdfsdfdsfe")
+                        for word in new_screen.split(" "):
+                            if word.isdigit():
+                                return int(word)
+                        else:
+                            raise RuntimeError("No solution found")
 
                 new_state = GameState(tuple(sorted(new_items)), room)
 
@@ -94,12 +91,6 @@ class GamePlayingEngine:
                         (m, new_items)
                         for m, _ in possible_moves
                         if not m.startswith("take")
-                    ]
-
-                # For a drop move, cache all other moves.
-                if move.startswith("drop"):
-                    self.__drop_move_cache[new_state] = [
-                        (m, new_items) for m, _ in possible_moves if m != move
                     ]
 
                 if new_state not in self.__visited_states:
@@ -113,6 +104,8 @@ class GamePlayingEngine:
                 self.__state_pool.remove(state)
                 del self.__state_screen_map[state]
                 del self.__state_emulator_map[state]
+
+        raise RuntimeError("No solution found")
 
     @staticmethod
     def get_possible_moves(
@@ -140,12 +133,5 @@ class GamePlayingEngine:
                     parsing_doors = False
                     parsing_items = False
 
-        # TODO: Remove all dropping!
-        # for item in items:
-        #     new_items = copy(items)
-        #     new_items.remove(item)
-        #     yield f"drop {item}", new_items
 
-
-GamePlayingEngine().solve()
-raise RuntimeError("Done")
+puzzle.answer_a = GamePlayingEngine().solve()

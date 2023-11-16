@@ -191,9 +191,7 @@ class AsciiComputer:
     @staticmethod
     async def _run_to_next_command(emulator: IntcodeEmulator):
         task = asyncio.create_task(emulator.run())
-        render = AsciiComputer._render(emulator)
         try:
-            # TODO: WHY TIMEOUT?
             await asyncio.wait_for(emulator.wants_input.wait(), timeout=0.1)
         except asyncio.TimeoutError:
             pass
