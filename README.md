@@ -9,6 +9,9 @@ Collect stars by solving puzzles. Two puzzles will be made available on each day
 This year, I aimed to challenge myself to keep up with the Advent of Code the best I could, doing assignments on the day itself as much as possible.
 In addition, I wanted to only use standard libraries, and being better about writing clean code than last year, making code common in `aoc.py` whenever possible.
 
+I came back to this year a few years later, finishing the remaining challenges.
+I see a lot of room for cleaner and faster solutions, but for now I will leave this as is and focus on different puzzles.
+
 ## Quick start
 
 All solutions import the `aoc.py` file for common functions.
@@ -18,9 +21,7 @@ The only dependency for this project is `advent-of-code-data`, the Python versio
 
 ## TODO
 
-- [ ] Formatter
-- [ ] Run all entrypoint
-- [ ] Split old code
-- [ ] Speed up dy 15
+- [ ] Speed up day 15
 - [ ] Day 16 without numpy
-- [ ] Clean up later day solutions
+- [ ] Speed up day 19
+- [ ] Do proper signaling in the async code. Practicing async was nice at the time, but I wrote the original without using the synchronisation primitives.

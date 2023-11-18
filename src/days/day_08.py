@@ -32,6 +32,7 @@ puzzle.answer_a = corruption_check
 
 
 # PART 2
+
 output_layer = []
 
 

@@ -21,6 +21,7 @@ async def run_intcode_program(noun, verb):
 
 
 # PART 1
+
 puzzle.answer_a = asyncio.run(run_intcode_program(12, 2))
 
 
